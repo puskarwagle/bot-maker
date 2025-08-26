@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Bot Builder{% endblock %}</title>
+
+    <!-- CSS Dependencies -->
+    {% block css %}
+    <script src="{{ config.ui.tailwind_cdn }}"></script>
+    <link href="{{ config.ui.daisyui_cdn }}" rel="stylesheet" type="text/css" />
+    {% if config.ui.custom_css %}
+    <link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet" type="text/css" />
+    {% endif %}
+    {% endblock %}
+
+    {% block extra_head %}{% endblock %}
+</head>
+
+<body class="{{ config.ui.body_classes }}">
+    <div class="container mx-auto p-6">
+        {% block header %}
+        <h1 class="text-3xl font-bold mb-6 text-center">{{ config.app.title }}</h1>
+        {% endblock %}
+
+        {% block navigation %}
+        {% include 'components/tabs.html' %}
+        {% endblock %}
+
+        {% block content %}{% endblock %}
+    </div>
+
+    {% block scripts %}
+    <!-- Load config via API to avoid Jinja2 JSON issues -->
+    <script>
+        // Load config from API endpoint
+        fetch('/api/config')
+            .then(response => response.json())
+            .then(config => {
+                window.appConfig = config;
+                // Dispatch event when config is loaded
+                window.dispatchEvent(new CustomEvent('configLoaded', { detail: config }));
+            })
+            .catch(error => {
+                console.warn('Could not load config:', error);
+                window.appConfig = {};
+            });
+    </script>
+    <script type="module" src="{{ url_for('static', filename='js/main.js') }}"></script>
+    {% endblock %}
+
+    {% block extra_scripts %}{% endblock %}
+</body>
+
+</html>

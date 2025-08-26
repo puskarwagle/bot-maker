@@ -1,0 +1,27 @@
+{
+  "bot_name": "testlinkedin",
+  "start_url": "https://www.linkedin.com/jobs/",
+  "states": [
+    {
+      "id": "state_1756204966268",
+      "action": "click",
+      "selectors": [
+        "#jobs-search-box-location-id-ember30",
+        "input[aria-label=\"City",
+        "state",
+        "or zip code\"]",
+        "'combobox'",
+        "{ name: 'City",
+        "state",
+        "or zip code' }"
+      ],
+      "transitions": [
+        {
+          "condition": "always",
+          "next": "END"
+        }
+      ]
+    }
+  ],
+  "file_name": "testlinkedin.json"
+}

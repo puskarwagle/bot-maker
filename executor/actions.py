@@ -1,0 +1,66 @@
+# executor/actions.py
+from typing import List
+from playwright.async_api import Page
+from utils.config_manager import config_manager
+
+# Load configuration using ConfigManager
+config = config_manager.load()
+ACTIONS = {}
+
+def register_action(name):
+    def decorator(func):
+        ACTIONS[name] = func
+        return func
+    return decorator
+
+@register_action("click")
+async def click(page: Page, state: dict, context: dict):
+    selectors = state.get("selectors") or [state.get("selector")]
+    for s in selectors:
+        if await page.query_selector(s):
+            await page.click(s)
+            print(f"Clicked {s}")
+            return
+    raise Exception(f"No working selector for click in state {state['id']}")
+
+@register_action("fill")
+async def fill(page: Page, state: dict, context: dict):
+    value = state.get("value")
+    selectors = state.get("selectors") or [state.get("selector")]
+    for s in selectors:
+        if await page.query_selector(s):
+            await page.fill(s, value)
+            print(f"Filled '{value}' into {s}")
+            return
+    raise Exception(f"No working selector for fill in state {state['id']}")
+
+@register_action("extract")
+async def extract(page: Page, state: dict, context: dict):
+    store_as = state.get("store_as")
+    selectors = state.get("selectors") or [state.get("selector")]
+    for s in selectors:
+        el = await page.query_selector(s)
+        if el:
+            text = await page.inner_text(s)
+            context[store_as] = text
+            print(f"Extracted '{text}' into {store_as}")
+            return
+    raise Exception(f"No working selector for extract in state {state['id']}")
+
+@register_action("hover")
+async def hover(page: Page, state: dict, context: dict):
+    selectors = state.get("selectors") or [state.get("selector")]
+    for s in selectors:
+        if await page.query_selector(s):
+            await page.hover(s)
+            print(f"Hovered over {s}")
+            return
+    raise Exception(f"No working selector for hover in state {state['id']}")
+
+@register_action("wait_for")
+async def wait_for(page: Page, state: dict, context: dict):
+    selector = state.get("selectors")[0]
+    default_timeout = config.get("browser", {}).get("timeout", 5000)
+    timeout = state.get("timeout", default_timeout)
+    await page.wait_for_selector(selector, timeout=timeout)
+    print(f"Waited for {selector} (timeout: {timeout}ms)")
