@@ -27,8 +27,9 @@
 
             <div>
                 <label class="label">{{ editor.selector_label }}</label>
-                <input type="text" id="selector" placeholder="{{ editor.selector_placeholder }}"
-                    class="input input-bordered w-full" />
+                <div id="selectors-container" class="space-y-2">
+                    <input type="text" class="selector-input input input-bordered w-full" placeholder="{{ editor.selector_placeholder }}" />
+                </div>
             </div>
 
             <div id="value-group">

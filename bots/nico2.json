@@ -1,0 +1,21 @@
+{
+  "bot_name": "nico2",
+  "start_url": "https://www.linkedin.com/jobs/",
+  "states": [
+    {
+      "id": "state_1756237122746",
+      "action": "click",
+      "selectors": [
+        "dfsa"
+      ],
+      "transitions": [
+        {
+          "condition": "always",
+          "next": "END"
+        }
+      ]
+    }
+  ],
+  "file_name": "nico2.json",
+  "editingStateIndex": null
+}

@@ -278,7 +278,7 @@ def list_conditions():
     Frontend can use these to populate the 'Condition' dropdown dynamically
     """
     funcs = [name for name, obj in inspect.getmembers(conditions_module) if inspect.isfunction(obj)]
-    standard_conditions = ['always']
+    standard_conditions = ['element_exists']
     return jsonify(sorted(list(set(funcs + standard_conditions))))
 
 @app.route('/api/config', methods=['GET'])

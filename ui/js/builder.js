@@ -1,10 +1,11 @@
 import { refreshBotsList } from "./botList.js";
 import { renderStates } from "./states.js";
+import { validateBotName, validateStartUrl, showValidationErrors, clearValidationErrors } from "./validation.js";
 
-// export your global bot reference if you keep it in a module
+// export your global bot reference
 export let bot = {
-  bot_name: "MyBot",
-  start_url: "https://example.com",
+  bot_name: "",
+  start_url: "",
   states: [],
   file_name: null
 };
@@ -22,22 +23,27 @@ export function slugifyName(name) {
 // ------------------ Create New Bot ------------------
 export async function createNewBot() {
   const rawName = (document.getElementById("bot-name")?.value || "").trim();
-  if (!rawName) {
-    alert("Enter a bot name first");
+  const startUrl = (document.getElementById("start-url")?.value || "").trim();
+
+  // Clear previous validation messages
+  clearValidationErrors();
+
+  // ✅ Validate Bot Name
+  const nameValidation = validateBotName(rawName);
+  if (!nameValidation.isValid) {
+    showValidationErrors(nameValidation.errors);
+    return;
+  }
+
+  // ✅ Validate Start URL
+  const urlValidation = validateStartUrl(startUrl);
+  if (!urlValidation.isValid) {
+    showValidationErrors(urlValidation.errors);
     return;
   }
 
   const slug = slugifyName(rawName);
   const fileName = `${slug}.json`;
-  const startUrl = (document.getElementById("start-url")?.value || "").trim();
-
-  // ✅ Validate URL
-  try {
-    new URL(startUrl);
-  } catch {
-    alert("Please enter a valid URL (including https:// or http://).");
-    return;
-  }
 
   // Optional: prevent accidental overwrite
   try {
@@ -58,10 +64,10 @@ export async function createNewBot() {
   }
 
   const newBot = {
-    bot_name: rawName,       // keep the display name as user entered
+    bot_name: rawName,
     start_url: startUrl,
     states: [],
-    file_name: fileName      // ensure server uses login_bot.json etc.
+    file_name: fileName
   };
 
   try {
@@ -81,7 +87,10 @@ export async function createNewBot() {
     // Adopt the new bot as current; ensure file_name is set
     bot = { ...newBot };
 
-    renderStates();
+    // Load the bot into the editor
+    const { loadBot } = await import('./botEditor.js');
+    loadBot(newBot);
+
     refreshBotsList();
     alert(`Created bot: ${rawName} (${fileName})`);
   } catch (err) {

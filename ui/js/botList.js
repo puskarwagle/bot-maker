@@ -1,4 +1,5 @@
 import { fetchBots, startBotAPI, stopBotAPI, deleteBot, loadBotFile } from './api.js';
+import { validateBotName, validateStartUrl, showValidationErrors, clearValidationErrors } from './validation.js';
 
 export async function refreshBotsDashboard() {
     const botsList = document.getElementById('bots-list');
@@ -110,28 +111,41 @@ async function handleEditorButtonClick(event) {
     } else if (action === 'delete') {
         if (confirm(`Are you sure you want to delete ${botFile}?`)) {
             await deleteBot(botFile);
-            refreshBotsEditor();
+            // Refresh both editor list and dashboard
+            await refreshBotsList();
         }
     }
 }
 
-// -------------------- Load Bot for Editing --------------------
+
+// -------------------- Load Bot for Editing with Validation --------------------
 async function loadBot(file) {
     try {
         const botData = await loadBotFile(file);
-        // Import bot editor and load the bot
+        clearValidationErrors();
+
+        // Validate bot name & start URL before editing
+        const nameValidation = validateBotName(botData.bot_name || '');
+        const urlValidation = validateStartUrl(botData.start_url || '');
+        const validationErrors = [...nameValidation.errors, ...urlValidation.errors];
+
+        if (validationErrors.length > 0) {
+            showValidationErrors(validationErrors);
+            console.warn('Bot validation failed on load:', validationErrors);
+        }
+
         const { bot } = await import('./botEditor.js');
         Object.assign(bot, botData);
         bot.file_name = file;
-        
-        // Update UI with loaded bot data
+
+        // Update editor UI
         document.getElementById('bot-name').value = botData.bot_name || '';
         document.getElementById('start-url').value = botData.start_url || '';
-        
+
         // Re-render states
         const { renderStates } = await import('./states.js');
         renderStates();
-        
+
         console.log('Bot loaded for editing:', file);
     } catch (error) {
         console.error('Failed to load bot:', error);
@@ -139,7 +153,7 @@ async function loadBot(file) {
     }
 }
 
-// Convenience function if you still want both updated together
+// Convenience function to refresh both dashboards
 export async function refreshBotsList() {
     await Promise.all([refreshBotsDashboard(), refreshBotsEditor()]);
 }

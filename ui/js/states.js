@@ -63,13 +63,16 @@ export function loadState(index) {
     const state = bot.states[index];
     if (!state) return;
     
-    document.getElementById('action').value = state.action;
-    document.getElementById('selector').value = state.selectors.join(', ');
-    document.getElementById('value').value = state.value || state.store_as || '';
-    
-    // Set editing index
-    bot.editingStateIndex = index;
-    
-    // TODO: Load transitions into the transitions container
-    console.log('Loading state for editing:', state);
+    // Import the selector functions
+    import('./botEditor.js').then(({ setSelectorValues }) => {
+        document.getElementById('action').value = state.action;
+        setSelectorValues(state.selectors || []);
+        document.getElementById('value').value = state.value || state.store_as || '';
+        
+        // Set editing index
+        bot.editingStateIndex = index;
+        
+        // TODO: Load transitions into the transitions container
+        console.log('Loading state for editing:', state);
+    });
 }

@@ -2,5 +2,5 @@ __pycache__/
 *.py[cod]
 .vscode/
 MODULARIZATION_SUMMARY.md
-praise.md
+data/praise.md
 
