@@ -4,12 +4,12 @@
   "states": [
     {
       "action": "do_nothing",
-      "id": "start",
+      "id": "state_1756325716934",
       "selectors": [],
       "transitions": [
         {
           "condition": "element_exists",
-          "next": "username",
+          "next": "PAUSE",
           "selectors": [
             "a[href*=\"/login\"][data-tracking-control-name=\"guest_homepage-jobseeker_nav-header-signin\"]"
           ]
@@ -44,8 +44,8 @@
       ]
     },
     {
-      "id": "password",
       "action": "fill",
+      "id": "state_1756323322777",
       "selectors": [
         "input[type=\"password\"][name=\"session_password\"]"
       ],
@@ -55,9 +55,9 @@
           "next": "sign_in_button"
         }
       ],
-      "value": "Karmaamputee#123"
+      "value": "MeltBanana1"
     }
   ],
   "file_name": "nico2.json",
-  "editingStateIndex": 1
+  "editingStateIndex": 0
 }

@@ -1,7 +1,4 @@
 __pycache__/
 *.py[cod]
 .vscode/
-MODULARIZATION_SUMMARY.md
-data/praise.md
-data/js
-data/templates
+ignoreme/
