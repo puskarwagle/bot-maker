@@ -1,10 +1,7 @@
 # executor/conditions.py
 from typing import List
 from playwright.async_api import Page
-from utils.config_manager import config_manager
 
-# Load configuration using ConfigManager
-config = config_manager.load()
 CONDITIONS = {}
 
 def register_condition(name):

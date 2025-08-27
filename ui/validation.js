@@ -1,7 +1,6 @@
 // -------------------- Form Validation Module --------------------
 
-
-import { getAllowedActions, getAllowedConditions } from './botEditor.js';
+import { getAllowedActions, getAllowedConditions } from './app.js';
 
 // -------------------- Validation Functions --------------------
 
@@ -101,6 +100,10 @@ export function validateState(state, index = 0, existingIds = new Set()) {
         return { isValid: false, errors };
     }
 
+    // Get dynamic allowed values
+    const ALLOWED_ACTIONS = getAllowedActions();
+    const ALLOWED_CONDITIONS = getAllowedConditions();
+
     // Validate ID
     if (!state.id || typeof state.id !== 'string' || state.id.trim().length === 0) {
         errors.push(`${stateLabel}: id is required and must be a non-empty string`);
@@ -111,7 +114,7 @@ export function validateState(state, index = 0, existingIds = new Set()) {
     // Validate action
     if (!state.action || typeof state.action !== 'string') {
         errors.push(`${stateLabel}: action is required`);
-    } else if (!ALLOWED_ACTIONS.includes(state.action)) {
+    } else if (ALLOWED_ACTIONS.length > 0 && !ALLOWED_ACTIONS.includes(state.action)) {
         errors.push(`${stateLabel}: action "${state.action}" is not allowed. Must be one of: ${ALLOWED_ACTIONS.join(', ')}`);
     }
 
@@ -153,10 +156,13 @@ export function validateTransition(transition, label = 'Transition') {
         return { isValid: false, errors };
     }
     
+    // Get dynamic allowed values
+    const ALLOWED_CONDITIONS = getAllowedConditions();
+    
     // Validate condition
     if (!transition.condition || typeof transition.condition !== 'string') {
         errors.push(`${label}: condition is required`);
-    } else if (!ALLOWED_CONDITIONS.includes(transition.condition)) {
+    } else if (ALLOWED_CONDITIONS.length > 0 && !ALLOWED_CONDITIONS.includes(transition.condition)) {
         errors.push(`${label}: condition "${transition.condition}" is not allowed. Must be one of: ${ALLOWED_CONDITIONS.join(', ')}`);
     }
     
@@ -352,6 +358,3 @@ function slugifyName(name) {
         .replace(/^_+|_+$/g, '')
         .replace(/_{2,}/g, '_');
 }
-
-// Export allowed values for use in other modules
-export { ALLOWED_ACTIONS, ALLOWED_CONDITIONS };

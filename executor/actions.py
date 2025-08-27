@@ -1,10 +1,6 @@
-# executor/actions.py
 from typing import List
 from playwright.async_api import Page
-from utils.config_manager import config_manager
 
-# Load configuration using ConfigManager
-config = config_manager.load()
 ACTIONS = {}
 
 def register_action(name):
@@ -67,8 +63,11 @@ async def hover(page: Page, state: dict, context: dict):
 
 @register_action("wait_for")
 async def wait_for(page: Page, state: dict, context: dict):
-    selector = state.get("selectors")[0]
-    default_timeout = config.get("browser", {}).get("timeout", 5000)
+    selectors = state.get("selectors") or []
+    if not selectors:
+        raise Exception(f"No selectors provided for wait_for in state {state['id']}")
+    selector = selectors[0]
+    default_timeout = 5000
     timeout = state.get("timeout", default_timeout)
     await page.wait_for_selector(selector, timeout=timeout)
     print(f"Waited for {selector} (timeout: {timeout}ms)")

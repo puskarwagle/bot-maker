@@ -3,22 +3,36 @@
   "start_url": "https://www.linkedin.com/jobs/",
   "states": [
     {
+      "action": "do_nothing",
+      "id": "start",
+      "selectors": [],
+      "transitions": [
+        {
+          "condition": "element_exists",
+          "next": "username",
+          "selectors": [
+            "a[href*=\"/login\"][data-tracking-control-name=\"guest_homepage-jobseeker_nav-header-signin\"]"
+          ]
+        }
+      ]
+    },
+    {
       "action": "fill",
-      "id": "state_1756243133101",
+      "id": "username",
       "selectors": [
         "input#session_key[name=\"session_key\"]"
       ],
       "transitions": [
         {
           "condition": "always",
-          "next": "state_1756243096454"
+          "next": "password"
         }
       ],
       "value": "puskarwagle17@gmail.com"
     },
     {
       "action": "click",
-      "id": "state_1756244224555",
+      "id": "sign_in_button",
       "selectors": [
         "button[type=\"submit\"][data-id=\"sign-in-form__submit-btn\"]"
       ],
@@ -31,7 +45,7 @@
     },
     {
       "action": "fill",
-      "id": "state_1756243096454",
+      "id": "password",
       "selectors": [
         "input[type=\"password\"][name=\"session_password\"]"
       ],
@@ -45,5 +59,5 @@
     }
   ],
   "file_name": "nico2.json",
-  "editingStateIndex": null
+  "editingStateIndex": 3
 }

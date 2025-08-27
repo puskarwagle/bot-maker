@@ -3,4 +3,5 @@ __pycache__/
 .vscode/
 MODULARIZATION_SUMMARY.md
 data/praise.md
-
+data/js
+data/templates
