@@ -1,15 +1,7 @@
 // -------------------- Form Validation Module --------------------
 
-// Allowed actions and conditions (these should match your backend)
-const ALLOWED_ACTIONS = [
-    'extract', 'click', 'fill', 'navigate', 'wait', 'scroll', 
-    'hover', 'submit', 'select', 'check', 'uncheck'
-];
 
-const ALLOWED_CONDITIONS = [
-    'element_exists', 'text_matches', 'url_contains', 'always', 
-    'element_not_exists', 'text_not_matches', 'url_not_contains'
-];
+import { getAllowedActions, getAllowedConditions } from './botEditor.js';
 
 // -------------------- Validation Functions --------------------
 
@@ -87,7 +79,10 @@ export function validateStates(states) {
     states.forEach((state, index) => {
         if (state.transitions && Array.isArray(state.transitions)) {
             state.transitions.forEach((transition, tIndex) => {
-                if (transition.next && transition.next !== 'END' && !stateIds.has(transition.next)) {
+                if (transition.next && 
+                    transition.next !== 'END' && 
+                    transition.next !== 'PAUSE' && 
+                    !stateIds.has(transition.next)) {
                     errors.push(`State ${index + 1}, transition ${tIndex + 1}: references non-existent state "${transition.next}"`);
                 }
             });
@@ -100,39 +95,41 @@ export function validateStates(states) {
 export function validateState(state, index = 0, existingIds = new Set()) {
     const errors = [];
     const stateLabel = `State ${index + 1}`;
-    
+
     if (!state || typeof state !== 'object') {
         errors.push(`${stateLabel}: must be an object`);
         return { isValid: false, errors };
     }
-    
+
     // Validate ID
     if (!state.id || typeof state.id !== 'string' || state.id.trim().length === 0) {
         errors.push(`${stateLabel}: id is required and must be a non-empty string`);
     } else if (existingIds.has(state.id)) {
         errors.push(`${stateLabel}: id "${state.id}" is not unique`);
     }
-    
+
     // Validate action
     if (!state.action || typeof state.action !== 'string') {
         errors.push(`${stateLabel}: action is required`);
     } else if (!ALLOWED_ACTIONS.includes(state.action)) {
         errors.push(`${stateLabel}: action "${state.action}" is not allowed. Must be one of: ${ALLOWED_ACTIONS.join(', ')}`);
     }
-    
+
     // Validate selectors
-    if (!Array.isArray(state.selectors)) {
-        errors.push(`${stateLabel}: selectors must be an array`);
-    } else if (state.selectors.length === 0) {
-        errors.push(`${stateLabel}: at least one selector is required`);
-    } else {
-        state.selectors.forEach((selector, sIndex) => {
-            if (!selector || typeof selector !== 'string' || selector.trim().length === 0) {
-                errors.push(`${stateLabel}: selector ${sIndex + 1} must be a non-empty string`);
-            }
-        });
+    if (state.action !== 'do_nothing') { // do_nothing can have zero selectors
+        if (!Array.isArray(state.selectors)) {
+            errors.push(`${stateLabel}: selectors must be an array`);
+        } else if (state.selectors.length === 0) {
+            errors.push(`${stateLabel}: at least one selector is required`);
+        } else {
+            state.selectors.forEach((selector, sIndex) => {
+                if (!selector || typeof selector !== 'string' || selector.trim().length === 0) {
+                    errors.push(`${stateLabel}: selector ${sIndex + 1} must be a non-empty string`);
+                }
+            });
+        }
     }
-    
+
     // Validate transitions
     if (state.transitions) {
         if (!Array.isArray(state.transitions)) {
@@ -144,7 +141,7 @@ export function validateState(state, index = 0, existingIds = new Set()) {
             });
         }
     }
-    
+
     return { isValid: errors.length === 0, errors };
 }
 

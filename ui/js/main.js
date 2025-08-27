@@ -5,6 +5,7 @@ import { refreshBotsList } from './botList.js';
 import { addTransitionForm } from './transitions.js';
 import { createNewBot } from './builder.js';
 import { validateField, validateBotName, validateStartUrl } from './validation.js';
+import { newState } from './states.js';
 
 // -------------------- Initialize UI --------------------
 document.addEventListener('DOMContentLoaded', async () => {
@@ -27,6 +28,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById("add-transition-btn")?.addEventListener("click", addTransitionForm);
     document.getElementById("create-bot-btn")?.addEventListener("click", createNewBot);
     document.getElementById("add-state-btn")?.addEventListener("click", addState);
+    document.getElementById("new-state-btn")?.addEventListener("click", newState);
 
     // -------------------- Load Dynamic Data --------------------
     await loadDropdownOptions();

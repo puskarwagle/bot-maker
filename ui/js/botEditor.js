@@ -1,8 +1,6 @@
 import { saveBot, fetchActions, fetchConditions } from './api.js';
 import { renderStates } from './states.js';
 import {
-    validateBotName,
-    validateStartUrl,
     validateState,
     validateTransition,
     validateBot,
@@ -19,6 +17,7 @@ export let bot = {
 
 // -------------------- Load Bot --------------------
 export function loadBot(botData) {
+    console.log("loadBot called");
     bot.bot_name = botData.bot_name || '';
     bot.start_url = botData.start_url || '';
     bot.states = botData.states || [];
@@ -30,6 +29,48 @@ export function loadBot(botData) {
 }
 
 let autoSaveTimeout;
+
+let ALLOWED_ACTIONS = [];
+let ALLOWED_CONDITIONS = [];
+
+
+
+// -------------------- Dropdowns --------------------
+export async function loadDropdownOptions() {
+    // Fetch both from backend
+    const actions = await fetchActions();
+    const conditions = await fetchConditions();
+
+    // Update globals
+    ALLOWED_ACTIONS = actions;
+    ALLOWED_CONDITIONS = conditions;
+
+    // Populate dropdowns
+    const actionSelects = document.querySelectorAll(".action-select");
+    actionSelects.forEach(sel => {
+        sel.innerHTML = ""; // clear
+        actions.forEach(a => {
+            const opt = document.createElement("option");
+            opt.value = a;
+            opt.textContent = a;
+            sel.appendChild(opt);
+        });
+    });
+
+    const conditionSelects = document.querySelectorAll(".condition-select");
+    conditionSelects.forEach(sel => {
+        sel.innerHTML = "";
+        conditions.forEach(c => {
+            const opt = document.createElement("option");
+            opt.value = c;
+            opt.textContent = c;
+            sel.appendChild(opt);
+        });
+    });
+}
+
+export function getAllowedActions() { return ALLOWED_ACTIONS; }
+export function getAllowedConditions() { return ALLOWED_CONDITIONS; }
 
 // -------------------- Selector Inputs --------------------
 export function getSelectorValues() {
@@ -103,21 +144,6 @@ function handleSelectorInput(event) {
             emptyInputs[i].remove();
         }
     }
-}
-
-// -------------------- Dropdowns --------------------
-export async function loadDropdownOptions() {
-    const actions = await fetchActions();
-    const conditions = await fetchConditions();
-
-    const actionSelect = document.getElementById('action');
-    const conditionSelects = document.querySelectorAll('.transition-condition');
-
-    actionSelect.innerHTML = actions.map(a => `<option value="${a}">${a}</option>`).join('');
-
-    conditionSelects.forEach(sel => {
-        sel.innerHTML = conditions.map(c => `<option value="${c}">${c}</option>`).join('');
-    });
 }
 
 // -------------------- Auto-save --------------------
@@ -213,3 +239,4 @@ function updatePreview() {
     }
     autoSaveBot();
 }
+

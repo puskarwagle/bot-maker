@@ -3,17 +3,45 @@
   "start_url": "https://www.linkedin.com/jobs/",
   "states": [
     {
-      "id": "state_1756237122746",
-      "action": "click",
+      "action": "fill",
+      "id": "state_1756243133101",
       "selectors": [
-        "dfsa"
+        "input#session_key[name=\"session_key\"]"
       ],
       "transitions": [
         {
           "condition": "always",
-          "next": "END"
+          "next": "state_1756243096454"
+        }
+      ],
+      "value": "puskarwagle17@gmail.com"
+    },
+    {
+      "action": "click",
+      "id": "state_1756244224555",
+      "selectors": [
+        "button[type=\"submit\"][data-id=\"sign-in-form__submit-btn\"]"
+      ],
+      "transitions": [
+        {
+          "condition": "always",
+          "next": "PAUSE"
         }
       ]
+    },
+    {
+      "action": "fill",
+      "id": "state_1756243096454",
+      "selectors": [
+        "input[type=\"password\"][name=\"session_password\"]"
+      ],
+      "transitions": [
+        {
+          "condition": "always",
+          "next": "PAUSE"
+        }
+      ],
+      "value": "Karmaamputee#123"
     }
   ],
   "file_name": "nico2.json",

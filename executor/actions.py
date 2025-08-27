@@ -13,6 +13,14 @@ def register_action(name):
         return func
     return decorator
 
+@register_action("do_nothing")
+async def do_nothing(page: Page, state: dict, context: dict):
+    """
+    A no-op action that does nothing.
+    Useful for states that only have conditions/transitions.
+    """
+    pass
+
 @register_action("click")
 async def click(page: Page, state: dict, context: dict):
     selectors = state.get("selectors") or [state.get("selector")]

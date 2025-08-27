@@ -1,4 +1,3 @@
-// ui/js/api.js
 export async function fetchBots() {
     const res = await fetch('/api/bots');
     return res.json();
@@ -41,15 +40,26 @@ export async function stopBotAPI(botName) {
     return res.json();
 }
 
+// -------------------- Pause / Resume --------------------
+export async function pauseBotAPI(botName) {
+    const res = await fetch(`/api/bots/${encodeURIComponent(botName)}/pause`, { method: 'POST' });
+    return res.json();
+}
+
+export async function resumeBotAPI(botName) {
+    const res = await fetch(`/api/bots/${encodeURIComponent(botName)}/resume`, { method: 'POST' });
+    return res.json();
+}
+
+// -------------------- Dynamic Actions & Conditions --------------------
 export async function fetchActions() {
     const res = await fetch("/api/actions");
     if (!res.ok) return [];
     return res.json();
-  }
-  
-  export async function fetchConditions() {
+}
+
+export async function fetchConditions() {
     const res = await fetch("/api/conditions");
     if (!res.ok) return [];
     return res.json();
-  }
-  
+}

@@ -35,7 +35,6 @@ class ConfigManager:
                 "tabs": [
                     {"id": "builder", "label": "Bot Builder", "active": True},
                     {"id": "bots", "label": "Bots", "active": False},
-                    {"id": "runner", "label": "Bot Runner", "active": False}
                 ]
             },
             "builder": {
@@ -59,12 +58,6 @@ class ConfigManager:
                 "add_state_text": "Add/Update State",
                 "states_list_title": "Bot States",
                 "json_preview_title": "JSON Preview"
-            },
-            "runner": {
-                "available_bots_title": "Available Bots",
-                "loading_text": "Loading bots...",
-                "show_refresh_button": True,
-                "refresh_button_text": "🔄 Refresh"
             },
             "browser": {
                 "type": "chromium",
@@ -153,7 +146,7 @@ class ConfigManager:
         config = self.load()
         
         # Basic validation
-        required_sections = ['app', 'ui', 'builder', 'editor', 'runner', 'browser', 'directories']
+        required_sections = ['app', 'ui', 'builder', 'editor', 'browser', 'directories']
         for section in required_sections:
             if section not in config:
                 print(f"Warning: Missing required config section: {section}")

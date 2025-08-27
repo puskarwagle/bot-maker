@@ -16,8 +16,7 @@
     "show_json_preview": false,
     "tabs": [
       {"id": "builder", "label": "Bot Builder", "active": true},
-      {"id": "bots", "label": "Bots", "active": false},
-      {"id": "runner", "label": "Bot Runner", "active": false}
+      {"id": "bots", "label": "Bots", "active": false}
     ]
   },
   "builder": {
@@ -42,12 +41,6 @@
     "states_list_title": "Bot States",
     "json_preview_title": "JSON Preview"
   },
-  "runner": {
-    "available_bots_title": "Available Bots",
-    "loading_text": "Loading bots...",
-    "show_refresh_button": true,
-    "refresh_button_text": "🔄 Refresh"
-  },
   "browser": {
     "type": "chromium",
     "headless": false,
@@ -65,6 +58,6 @@
   ],
   "auto_save": {
     "enabled": true,
-    "delay_ms": 500
+    "delay_ms": 100
   }
 }

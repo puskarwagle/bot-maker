@@ -39,47 +39,61 @@ bot_threads = {}
 
 # ----------------------------- Bot Runner Class -----------------------------
 class BotRunner:
-    """
-    Encapsulates a bot execution instance.
-    Manages browser, page, and async execution of a bot JSON file.
-    """
     def __init__(self, bot_file):
         self.bot_file = bot_file
         self.is_running = False
         self.browser = None
         self.page = None
-        
+        self._stop_event = asyncio.Event()
+        self._pause_event = asyncio.Event()  # NEW
+        self._pause_event.set()  # Initially not paused
+
     async def run(self):
-        """Run the bot asynchronously using Playwright"""
         self.is_running = True
         try:
-            # Load bot configuration to get start URL
             with open(self.bot_file, 'r') as f:
                 bot_config = json.load(f)
-            start_url = bot_config.get('start_url', config.get('builder', {}).get('default_url', 'https://example.com'))
+            start_url = bot_config.get('start_url', 'https://example.com')
 
             async with async_playwright() as p:
-                browser_config = config.get('browser', {})
-                browser_type = getattr(p, browser_config.get('type', 'chromium'))
-                self.browser = await browser_type.launch(headless=browser_config.get('headless', False))
+                browser_type = getattr(p, 'chromium')
+                self.browser = await browser_type.launch(headless=False)
                 self.page = await self.browser.new_page()
                 
-                print(f"🌐 Navigating to: {start_url}")
-                await self.page.goto(start_url)
-                
                 context = Context()
-                await run_bot(self.page, self.bot_file, context)
-                
-        except Exception as e:
-            print(f"Bot error: {e}")
+                bot_task = asyncio.create_task(run_bot(self.page, self.bot_file, context))
+                stop_task = asyncio.create_task(self._wait_for_stop())
+
+                while not bot_task.done():
+                    # Wait if paused
+                    await self._pause_event.wait()
+                    done, _ = await asyncio.wait([bot_task, stop_task], timeout=0.1, return_when=asyncio.FIRST_COMPLETED)
+
+                if stop_task.done():
+                    bot_task.cancel()
+                    try:
+                        await bot_task
+                    except asyncio.CancelledError:
+                        pass
+
         finally:
             if self.browser:
                 await self.browser.close()
             self.is_running = False
-    
+
     def stop(self):
-        """Stop the bot gracefully"""
-        self.is_running = False
+        self._stop_event.set()
+
+    def pause(self):
+        print("Pausing bot")
+        self._pause_event.clear()
+
+    def resume(self):
+        print("Resuming bot")
+        self._pause_event.set()
+
+    async def _wait_for_stop(self):
+        await self._stop_event.wait()
 
 def run_bot_async(bot_name, bot_file):
     """
@@ -106,7 +120,6 @@ def index():
         'active_tab': 'builder',
         'builder': config.get('builder', {}),
         'editor': config.get('editor', {}),
-        'runner': config.get('runner', {}),
         'actions': config.get('actions', [])
     }
     return render_template('index.html', **template_data)
@@ -148,6 +161,20 @@ def get_bots():
                 print(f"Error reading bot file {bot_file}: {e}")
     
     return jsonify(bots)
+
+@app.route('/api/bots/<bot_name>/pause', methods=['POST'])
+def pause_bot(bot_name):
+    if bot_name not in running_bots:
+        return jsonify({'error': 'Bot not running'}), 400
+    running_bots[bot_name].pause()
+    return jsonify({'message': f'Bot {bot_name} paused'})
+
+@app.route('/api/bots/<bot_name>/resume', methods=['POST'])
+def resume_bot(bot_name):
+    if bot_name not in running_bots:
+        return jsonify({'error': 'Bot not running'}), 400
+    running_bots[bot_name].resume()
+    return jsonify({'message': f'Bot {bot_name} resumed'})
 
 @app.route('/api/bots/save', methods=['POST'])
 def save_bot():

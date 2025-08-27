@@ -11,8 +11,10 @@
         </div>
     </div>
 
+    <div id="validation-errors" class="hidden"></div>
+
     <!-- State Builder -->
-    <div class="card bg-gray-800 p-4 shadow-lg">
+    <div id="state-builder-card" class="card bg-gray-800 p-4 shadow-lg hidden">
         <h2 class="text-lg font-semibold mb-4">{{ editor.state_builder_title }}</h2>
         <div class="space-y-4">
 
@@ -54,7 +56,10 @@
 
     <!-- States List -->
     <div class="card bg-gray-800 p-4 shadow-lg">
-        <h2 class="text-lg font-semibold mb-4">{{ editor.states_list_title }}</h2>
+        <div class="flex justify-between">
+            <h2 class="text-lg font-semibold mb-4">{{ editor.states_list_title }}</h2>
+            <button id="new-state-btn" class="btn hidden">New State</button> <!-- implement this -->
+        </div>
         <div id="states-container" class="space-y-3"></div>
     </div>
 
