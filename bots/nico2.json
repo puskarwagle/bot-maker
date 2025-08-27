@@ -44,20 +44,20 @@
       ]
     },
     {
-      "action": "fill",
       "id": "password",
+      "action": "fill",
       "selectors": [
         "input[type=\"password\"][name=\"session_password\"]"
       ],
       "transitions": [
         {
           "condition": "always",
-          "next": "PAUSE"
+          "next": "sign_in_button"
         }
       ],
       "value": "Karmaamputee#123"
     }
   ],
   "file_name": "nico2.json",
-  "editingStateIndex": 3
+  "editingStateIndex": 1
 }

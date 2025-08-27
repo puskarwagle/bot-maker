@@ -431,16 +431,17 @@ let bot = {
   async function loadStateTransitions(transitions) {
     const container = document.getElementById('transitions-container');
     if (!container) return;
-  
-    container.innerHTML = '';
-  
+
+    container.innerHTML = ''; // <<--- CLEAR previous transitions
+
     for (const transition of transitions) {
-      await addTransitionForm(transition.condition, transition.next);
-      const transitionDivs = container.querySelectorAll('.transition-item');
-      const lastDiv = transitionDivs[transitionDivs.length - 1];
-      populateTransitionForm(lastDiv, transition);
+        await addTransitionForm(transition.condition, transition.next);
+        const transitionDivs = container.querySelectorAll('.transition-item');
+        const lastDiv = transitionDivs[transitionDivs.length - 1];
+        populateTransitionForm(lastDiv, transition);
     }
-  }
+}
+
   
   function populateTransitionForm(transitionDiv, transitionData) {
     if (!transitionDiv || !transitionData) return;
