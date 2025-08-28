@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Dict
 from playwright.async_api import Page
 
 ACTIONS = {}
@@ -8,6 +8,25 @@ def register_action(name):
         ACTIONS[name] = func
         return func
     return decorator
+
+@register_action("press_enter")
+async def press_enter(page: Page, state: Dict, context: Dict):
+    """
+    Press the Enter key on a given selector, or on the active element if no selector is provided.
+    """
+    selectors = state.get("selectors") or [None]  # allow None for active element
+    for s in selectors:
+        if s:
+            el = await page.query_selector(s)
+            if el:
+                await el.press("Enter")
+                print(f"Pressed Enter on {s}")
+                return
+        else:
+            await page.keyboard.press("Enter")
+            print("Pressed Enter on active element")
+            return
+    raise Exception(f"No working selector to press Enter for state {state['id']}")
 
 @register_action("do_nothing")
 async def do_nothing(page: Page, state: dict, context: dict):
