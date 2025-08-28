@@ -4,9 +4,9 @@ import threading
 import time
 from pathlib import Path
 from flask import Flask, send_from_directory
+from playwright.async_api import async_playwright
 
-from api import register_api_routes  # Our new API module
-from executor.session import launch_persistent_context
+from api import register_api_routes  # Our API module
 
 # ----------------------------- Flask App -----------------------------
 app = Flask(
@@ -37,14 +37,13 @@ register_api_routes(app, running_bots, bot_threads)
 
 # ----------------------------- Browser Helpers -----------------------------
 async def start_browser():
-    """Launch Playwright persistent context and open dashboard tab."""
+    """Launch Playwright browser and open dashboard tab."""
     global playwright_instance, browser_context, browser_page
-    playwright_instance, browser_context, browser_page = await launch_persistent_context(
-        headless=False,
-        user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
-                   "(KHTML, like Gecko) Chrome/116.0.5845.140 Safari/537.36",
-        args=["--start-maximized"],
-    )
+
+    playwright_instance = await async_playwright().start()
+    browser = await playwright_instance.chromium.launch(headless=False)
+    browser_context = await browser.new_context()
+    browser_page = await browser_context.new_page()
 
     # Open dashboard page inside Playwright
     await browser_page.goto("http://localhost:5000")
@@ -75,7 +74,7 @@ def main():
     flask_thread.daemon = True
     flask_thread.start()
 
-    # Start Playwright persistent context and load dashboard
+    # Start Playwright browser and load dashboard
     try:
         asyncio.run(start_browser())
         # Keep the main thread alive while Flask + Playwright run

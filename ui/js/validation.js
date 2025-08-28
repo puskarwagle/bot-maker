@@ -119,8 +119,9 @@ export function validateState(state, index = 0, existingIds = new Set()) {
     }
 
     // Validate selectors
-    if (state.action !== 'do_nothing') { // do_nothing can have zero selectors
-        if (!Array.isArray(state.selectors)) {
+    // Only actions that actually need selectors will be checked here
+    if (state.action !== 'do_nothing' && state.action !== 'navigate_to') {  
+            if (!Array.isArray(state.selectors)) {
             errors.push(`${stateLabel}: selectors must be an array`);
         } else if (state.selectors.length === 0) {
             errors.push(`${stateLabel}: at least one selector is required`);

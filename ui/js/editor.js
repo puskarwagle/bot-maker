@@ -101,7 +101,15 @@
      });
      if (!transitions.length) transitions.push({ condition: "element_exists", next: "END" });
    
-     const newState = { id: "state_" + Date.now(), action, selectors, transitions };
+    //  const newState = { id: "state_" + Date.now(), action, selectors, transitions };
+    let stateId;
+    if (bot.editingStateIndex != null) {
+      // Keep the existing id when editing
+      stateId = bot.states[bot.editingStateIndex].id;
+    } else {
+      stateId = "state_" + Date.now();
+    }
+    const newState = { id: stateId, action, selectors, transitions };
      if (action === 'fill') newState.value = value;
      if (action === 'extract') newState.store_as = value;
    
@@ -281,7 +289,7 @@
          <div>
            <label class="block text-sm font-medium mb-1 text-primary">Pattern (for regex conditions)</label>
            <input type="text" class="transition-pattern input input-bordered input-sm w-full" 
-                 placeholder="Regex pattern (optional)" value="${transition.pattern || ''}" />
+                 placeholder="Regex pattern or url (optional)" value="${transition.pattern || ''}" />
          </div>
        </div>
        <button type="button" class="remove-transition btn btn-sm btn-error mt-2">Remove</button>

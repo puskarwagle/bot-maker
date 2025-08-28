@@ -4,14 +4,9 @@ from playwright.async_api import async_playwright
 
 DEFAULT_USER_DATA_DIR = Path("user_data")
 
-async def launch_persistent_context(
-    headless: bool = False,
-    user_agent: str = None,
-    args: list = None,
-    user_data_dir: Path = None,
-):
-    user_data_dir = user_data_dir or DEFAULT_USER_DATA_DIR
-    user_data_dir.mkdir(exist_ok=True)
+async def launch_persistent_context(bot_name: str, headless: bool = False, user_agent: str = None, args: list = None):
+    user_data_dir = DEFAULT_USER_DATA_DIR / bot_name
+    user_data_dir.mkdir(parents=True, exist_ok=True)
 
     playwright = await async_playwright().start()
     chromium = playwright.chromium
@@ -31,8 +26,8 @@ async def launch_persistent_context(
             "--disable-default-apps",
             "--disable-extensions",
             "--disable-popup-blocking",
-            "--disable-session-crashed-bubble",   # 🚫 restore pages prompt
-            "--disable-infobars",                 # 🚫 automation infobar
+            "--disable-session-crashed-bubble",
+            "--disable-infobars",
             "--lang=en-US,en",
             "--start-maximized",
             "--disable-web-security",
@@ -40,12 +35,9 @@ async def launch_persistent_context(
     )
 
     page = await context.new_page()
-
-    # 🔑 This is what actually makes it "maximized"
-    try:
-        await page.set_viewport_size(None)  # removes fixed viewport, uses full window
-    except Exception:
-        # Fallback: manually force a big window size
-        await page.set_viewport_size({"width": 1920, "height": 1080})
+    # try:
+    #     await page.set_viewport_size(None)
+    # except Exception:
+    #     await page.set_viewport_size({"width": 1920, "height": 1080})
 
     return playwright, context, page

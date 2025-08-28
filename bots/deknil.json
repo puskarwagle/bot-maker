@@ -43,26 +43,24 @@
       ],
       "transitions": [
         {
-          "condition": "always",
-          "next": "state_1756408322204"
+          "condition": "url_matches",
+          "next": "state_1756408322204",
+          "pattern": "https://www.linkedin.com/feed"
         }
       ]
     },
     {
       "id": "state_1756408322204",
-      "action": "click",
-      "selectors": [
-        "a[href='https://www.linkedin.com/jobs/']",
-        "a.global-nav__primary-link:has-text('Jobs')",
-        "span.global-nav__primary-link-text[title='Jobs']",
-        "a[aria-label='Jobs']"
-      ],
+      "action": "navigate_to",
+      "selectors": [],
       "transitions": [
         {
           "condition": "always",
-          "next": "pause"
+          "next": "pause",
+          "selectors": []
         }
-      ]
+      ],
+      "value": "https://www.linkedin.com/jobs"
     }
   ],
   "file_name": "deknil.json",

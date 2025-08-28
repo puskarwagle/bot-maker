@@ -36,7 +36,7 @@ async def run_bot(bot_name: str, page, bot_file, context, pause_event: asyncio.E
         if stop_event.is_set():
             print(f"🛑 STOP requested before state {state_id}, exiting")
             await page.context.close()
-            await page.browser.close()
+            # await page.browser.close()
             return
 
         # -------------------- Wait if PAUSED --------------------
@@ -44,7 +44,7 @@ async def run_bot(bot_name: str, page, bot_file, context, pause_event: asyncio.E
             if stop_event.is_set():
                 print(f"🛑 STOP received during PAUSE at state {state_id}, exiting")
                 await page.context.close()
-                await page.browser.close()
+                # await page.browser.close()
                 return
             await asyncio.sleep(0.1)  # short sleep, responsive to stop
 
@@ -67,7 +67,7 @@ async def run_bot(bot_name: str, page, bot_file, context, pause_event: asyncio.E
                 if stop_event.is_set():
                     print(f"🛑 STOP received during error pause at state {state_id}, exiting")
                     await page.context.close()
-                    await page.browser.close()
+                    # await page.browser.close()
                     return
                 await asyncio.sleep(0.1)
             # After resume, continue to next iteration
@@ -105,13 +105,13 @@ async def run_bot(bot_name: str, page, bot_file, context, pause_event: asyncio.E
                 if stop_event.is_set():
                     print(f"🛑 STOP received during pause at state {state_id}, exiting")
                     await page.context.close()
-                    await page.browser.close()
+                    # await page.browser.close()
                     return
                 await asyncio.sleep(0.1)
         elif next_state_id == "STOP":
             print(f"🛑 STOP triggered at state {state_id}, closing browser and exiting")
             await page.context.close()
-            await page.browser.close()
+            # await page.browser.close()
             return
         else:
             # Valid state_id, jump explicitly
