@@ -120,8 +120,10 @@ export function validateState(state, index = 0, existingIds = new Set()) {
 
     // Validate selectors
     // Only actions that actually need selectors will be checked here
-    if (state.action !== 'do_nothing' && state.action !== 'navigate_to') {  
-            if (!Array.isArray(state.selectors)) {
+    const noSelectorActions = new Set(["do_nothing", "navigate_to", "press_enter"]);
+
+    if (!noSelectorActions.has(state.action)) {  
+        if (!Array.isArray(state.selectors)) {
             errors.push(`${stateLabel}: selectors must be an array`);
         } else if (state.selectors.length === 0) {
             errors.push(`${stateLabel}: at least one selector is required`);
@@ -132,7 +134,7 @@ export function validateState(state, index = 0, existingIds = new Set()) {
                 }
             });
         }
-    }
+    }    
 
     // Validate transitions
     if (state.transitions) {

@@ -151,12 +151,6 @@
              <div class="flex-1">
                <div class="flex items-center justify-between mb-2">
                  <h3 class="card-title text-sm font-semibold text-primary">${state.id}</h3>
-                 <button 
-                   class="btn btn-xs btn-circle ${i === 0 ? 'btn-success' : 'btn-secondary'} first-state-btn" 
-                   title="Make this the first step" 
-                   data-state-id="${state.id}">
-                   ✓
-                 </button>
                </div>
                <p class="text-sm"><strong>Action:</strong> ${state.action}</p>
                <p class="text-sm"><strong>Selectors:</strong> ${Array.isArray(state.selectors) ? state.selectors.join(', ') : ''}</p>
@@ -165,6 +159,12 @@
              </div>
    
              <div class="flex gap-2 mt-2 sm:mt-0">
+               <button 
+                   class="btn btn-xs btn-circle ${i === 0 ? 'btn-success' : 'btn-secondary'} first-state-btn" 
+                   title="Make this the first step" 
+                   data-state-id="${state.id}">
+                   ✓
+                 </button>
                <button class="btn btn-sm btn-info" data-action="edit" data-index="${i}">✏️ Edit</button>
                <button class="btn btn-sm btn-error" data-action="delete" data-index="${i}">× Delete</button>
              </div>
@@ -269,7 +269,7 @@
          <div>
            <label class="block text-sm font-medium mb-1 text-primary">Condition</label>
            <select class="transition-condition select select-bordered select-sm w-full">
-             ${conditions.map(c => `<option value="${c}" ${c === (transition.condition || 'element_exists') ? 'selected' : ''}>${c}</option>`).join('')}
+             ${conditions.map(c => `<option value="${c}" ${c === (transition.condition || 'always') ? 'selected' : ''}>${c}</option>`).join('')}
            </select>
          </div>
          <div>

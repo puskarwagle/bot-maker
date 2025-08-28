@@ -50,8 +50,8 @@
       ]
     },
     {
-      "id": "state_1756408322204",
       "action": "navigate_to",
+      "id": "state_1756408322204",
       "selectors": [],
       "transitions": [
         {
@@ -83,8 +83,8 @@
       "value": "Python"
     },
     {
-      "action": "fill",
       "id": "state_1756421877733",
+      "action": "fill",
       "selectors": [
         "input[aria-label='City, state, or zip code']:not([disabled])",
         "input[aria-label*='Location']:not([disabled])"
@@ -92,10 +92,22 @@
       "transitions": [
         {
           "condition": "always",
-          "next": "pause"
+          "next": "state_1756424703329"
         }
       ],
       "value": "Sydney"
+    },
+    {
+      "id": "state_1756424703329",
+      "action": "press_enter",
+      "selectors": [],
+      "transitions": [
+        {
+          "condition": "always",
+          "next": "pause"
+        }
+      ],
+      "value": ""
     }
   ],
   "file_name": "deknil.json",
