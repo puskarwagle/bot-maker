@@ -1,3 +1,4 @@
+# api.py
 import json
 from pathlib import Path
 from flask import jsonify, request
@@ -11,7 +12,8 @@ from playwright.async_api import async_playwright
 
 # ----------------------------- BotRunner Class -----------------------------
 class BotRunner:
-    def __init__(self, bot_file):
+    def __init__(self, bot_name, bot_file):
+        self.bot_name = bot_name      # <--- add this
         self.bot_file = bot_file
         self.is_running = False
         self.browser = None
@@ -22,6 +24,7 @@ class BotRunner:
 
     async def run(self):
         self.is_running = True
+        print(f"🔹 Starting bot: {self.bot_name}, file: {self.bot_file}")
         try:
             with open(self.bot_file, "r") as f:
                 bot_config = json.load(f)
@@ -31,7 +34,9 @@ class BotRunner:
                 self.page = await self.browser.new_page()
 
                 context = Context()
-                bot_task = asyncio.create_task(run_bot(self.page, self.bot_file, context))
+                bot_task = asyncio.create_task(
+                    run_bot(self.bot_name, self.page, self.bot_file, context, self._pause_event, self._stop_event)
+                )
                 stop_task = asyncio.create_task(self._wait_for_stop())
 
                 while not bot_task.done():
@@ -70,7 +75,7 @@ class BotRunner:
 def run_bot_async(bot_name, bot_file):
     from main import bot_threads, running_bots  # lazy import here too
     def run_in_thread():
-        runner = BotRunner(bot_file)
+        runner = BotRunner(bot_name, bot_file)
         running_bots[bot_name] = runner
         asyncio.run(runner.run())
         running_bots.pop(bot_name, None)
@@ -155,25 +160,36 @@ def register_api_routes(app, running_bots, bot_threads):
         run_bot_async(bot_name, bot_file)
         return jsonify({"message": f"Bot {bot_name} started"})
 
+# ----------------------------- START PAUSE RESUME  -----------------------------
+
     @app.route("/api/bots/<bot_name>/stop", methods=["POST"])
     def stop_bot(bot_name):
-        if bot_name not in running_bots:
+        runner = running_bots.get(bot_name)
+        if not runner:
             return jsonify({"error": "Bot is not running"}), 400
-        running_bots[bot_name].stop()
+        print(f"🛑 STOP command received for bot {bot_name}")
+        runner._stop_event.set()  # signal stop
+        runner._pause_event.set()  # ensure it’s not stuck paused
         return jsonify({"message": f"Bot {bot_name} stopped"})
+
 
     @app.route("/api/bots/<bot_name>/pause", methods=["POST"])
     def pause_bot(bot_name):
-        if bot_name not in running_bots:
+        runner = running_bots.get(bot_name)
+        if not runner:
             return jsonify({"error": "Bot not running"}), 400
-        running_bots[bot_name].pause()
+        print(f"⏸ PAUSE command received for bot {bot_name}")
+        runner._pause_event.clear()  # pause the bot
         return jsonify({"message": f"Bot {bot_name} paused"})
+
 
     @app.route("/api/bots/<bot_name>/resume", methods=["POST"])
     def resume_bot(bot_name):
-        if bot_name not in running_bots:
+        runner = running_bots.get(bot_name)
+        if not runner:
             return jsonify({"error": "Bot not running"}), 400
-        running_bots[bot_name].resume()
+        print(f"▶️ RESUME command received for bot {bot_name}")
+        runner._pause_event.set()  # resume the bot
         return jsonify({"message": f"Bot {bot_name} resumed"})
 
     @app.route("/api/bots/<bot_file>", methods=["DELETE"])

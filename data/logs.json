@@ -1,0 +1,16 @@
+[
+  {
+    "timestamp": "2025-08-28T18:21:43.077061",
+    "level": "INFO",
+    "message": "BROWSER OVERLORD INITIALIZED - Playwright regime active",
+    "module": "seek_bot",
+    "data": {}
+  },
+  {
+    "timestamp": "2025-08-28T18:22:33.756197",
+    "level": "INFO",
+    "message": "BROWSER OVERLORD INITIALIZED - Playwright regime active",
+    "module": "seek_bot",
+    "data": {}
+  }
+]

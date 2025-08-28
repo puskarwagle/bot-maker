@@ -1,11 +1,16 @@
-# executor/run_bot.py
+# executor/runner.py
 import json
-from executor.actions import ACTIONS
-from executor.conditions import CONDITIONS
 import asyncio
 import sys
+from executor.actions import ACTIONS
+from executor.conditions import CONDITIONS
 
-async def run_bot(page, bot_file, context):
+async def run_bot(bot_name: str, page, bot_file, context, pause_event: asyncio.Event, stop_event: asyncio.Event):
+    """
+    Executes bot states, respecting PAUSE and STOP events.
+    pause_event: cleared = paused, set = running
+    stop_event: set = stop requested
+    """
     # -------------------- Load bot --------------------
     with open(bot_file, "r") as f:
         bot = json.load(f)
@@ -23,36 +28,57 @@ async def run_bot(page, bot_file, context):
     print("✅ Page loaded, starting states execution")
 
     # -------------------- State Execution Loop --------------------
-    while True:
-        # Handle case with no states or finished states
-        if current_state_index >= len(state_order):
-            print("⏸ No more states to execute, staying in PAUSE")
-            while True:
-                await asyncio.sleep(1)
-
+    while current_state_index < len(state_order):
         state = state_order[current_state_index]
         state_id = state["id"]
+
+        # -------------------- Check for STOP before action --------------------
+        if stop_event.is_set():
+            print(f"🛑 STOP requested before state {state_id}, exiting")
+            await page.context.close()
+            await page.browser.close()
+            return
+
+        # -------------------- Wait if PAUSED --------------------
+        while not pause_event.is_set():
+            if stop_event.is_set():
+                print(f"🛑 STOP received during PAUSE at state {state_id}, exiting")
+                await page.context.close()
+                await page.browser.close()
+                return
+            await asyncio.sleep(0.1)  # short sleep, responsive to stop
+
         print(f"\n🔹 Executing state {state_id} -> {state['action']}")
 
-        # Run action
+        # -------------------- Execute Action --------------------
         try:
             action_func = ACTIONS.get(state["action"])
             if action_func:
-                result = await action_func(page, state, context)
+                await action_func(page, state, context)
                 print(f"✅ Action '{state['action']}' executed successfully")
             else:
                 print(f"⚠️ Action '{state['action']}' not found, skipping state")
         except Exception as e:
             print(f"❌ Error in action '{state['action']}' at state {state_id}: {e}")
             print("⏸ Pausing bot due to error")
-            while True:
-                await asyncio.sleep(1)
+            # PAUSE until manually resumed or stopped
+            pause_event.clear()
+            while not pause_event.is_set():
+                if stop_event.is_set():
+                    print(f"🛑 STOP received during error pause at state {state_id}, exiting")
+                    await page.context.close()
+                    await page.browser.close()
+                    return
+                await asyncio.sleep(0.1)
+            # After resume, continue to next iteration
+            continue
 
-        # Evaluate transitions
+        # -------------------- Evaluate Transitions --------------------
         next_state_id = None
         transitions = state.get("transitions", [])
         if not transitions:
             print(f"ℹ️ No transitions defined for state {state_id}")
+
         for t in transitions:
             cond_name = t.get("condition")
             cond_func = CONDITIONS.get(cond_name)
@@ -71,16 +97,22 @@ async def run_bot(page, bot_file, context):
                 print(f"⚠️ Error evaluating condition '{cond_name}' with params {params}: {e}")
                 continue
 
-        # -------------------- Determine next step --------------------
-        if next_state_id == "PAUSE" or (next_state_id not in states and next_state_id != "STOP"):
-            print(f"⏸ PAUSE triggered at state {state_id} (next: {next_state_id})")
-            while True:
-                await asyncio.sleep(1)
+        # -------------------- Handle Next State --------------------
+        if next_state_id in ["pause", "PAUSE", "Pause"] or (next_state_id not in states and next_state_id != "STOP"):
+            print(f"⏸ Pause triggered at state {state_id} (next: {next_state_id})")
+            pause_event.clear()
+            while not pause_event.is_set():
+                if stop_event.is_set():
+                    print(f"🛑 STOP received during pause at state {state_id}, exiting")
+                    await page.context.close()
+                    await page.browser.close()
+                    return
+                await asyncio.sleep(0.1)
         elif next_state_id == "STOP":
             print(f"🛑 STOP triggered at state {state_id}, closing browser and exiting")
             await page.context.close()
             await page.browser.close()
-            sys.exit(0)
+            return
         else:
             # Valid state_id, jump explicitly
             if next_state_id in states:
@@ -90,7 +122,5 @@ async def run_bot(page, bot_file, context):
                 )
                 print(f"➡️ Jumping to state {next_state_id}")
             else:
-                # Fallback, just pause if somehow invalid
-                print(f"⚠️ Invalid next state '{next_state_id}' at state {state_id}, staying in PAUSE")
-                while True:
-                    await asyncio.sleep(1)
+                # No next or invalid, go to next sequentially
+                current_state_index += 1

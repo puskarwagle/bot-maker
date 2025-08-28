@@ -1,0 +1,70 @@
+{
+  "bot_name": "deknil",
+  "start_url": "https://www.linkedin.com/login",
+  "states": [
+    {
+      "action": "fill",
+      "id": "state_1756406193021",
+      "selectors": [
+        "#username",
+        "input[name='session_key']",
+        "input[aria-label='Email or phone']"
+      ],
+      "transitions": [
+        {
+          "condition": "always",
+          "next": "state_1756397927429"
+        }
+      ],
+      "value": "puskarwagle17@gmail.com"
+    },
+    {
+      "action": "fill",
+      "id": "state_1756397927429",
+      "selectors": [
+        "input[type='password'][name='session_password']"
+      ],
+      "transitions": [
+        {
+          "condition": "always",
+          "next": "state_1756398025686"
+        }
+      ],
+      "value": "MeltBanana1"
+    },
+    {
+      "action": "click",
+      "id": "state_1756398025686",
+      "selectors": [
+        "button[type='submit'][aria-label='Sign in']",
+        "button.btn__primary--large.from__button--floating",
+        "button[data-litms-control-urn='login-submit']",
+        "button:has-text('Sign in')"
+      ],
+      "transitions": [
+        {
+          "condition": "always",
+          "next": "state_1756408322204"
+        }
+      ]
+    },
+    {
+      "id": "state_1756408322204",
+      "action": "click",
+      "selectors": [
+        "a[href='https://www.linkedin.com/jobs/']",
+        "a.global-nav__primary-link:has-text('Jobs')",
+        "span.global-nav__primary-link-text[title='Jobs']",
+        "a[aria-label='Jobs']"
+      ],
+      "transitions": [
+        {
+          "condition": "always",
+          "next": "pause"
+        }
+      ]
+    }
+  ],
+  "file_name": "deknil.json",
+  "editingStateIndex": null
+}

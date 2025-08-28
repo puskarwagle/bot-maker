@@ -40,12 +40,10 @@ async def start_browser():
     """Launch Playwright persistent context and open dashboard tab."""
     global playwright_instance, browser_context, browser_page
     playwright_instance, browser_context, browser_page = await launch_persistent_context(
-        width=1280,
-        height=720,
         headless=False,
         user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
                    "(KHTML, like Gecko) Chrome/116.0.5845.140 Safari/537.36",
-        args=["--start-maximized"]
+        args=["--start-maximized"],
     )
 
     # Open dashboard page inside Playwright
