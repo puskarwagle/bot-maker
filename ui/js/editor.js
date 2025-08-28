@@ -110,9 +110,9 @@
       stateId = "state_" + Date.now();
     }
     const newState = { id: stateId, action, selectors, transitions };
-     if (action === 'fill') newState.value = value;
-     if (action === 'extract') newState.store_as = value;
-   
+    newState.value = value || '';
+    if (action === 'extract') newState.store_as = value;
+
      const stateValidation = validateState(newState);
      const transitionErrors = transitions.flatMap((t, i) => validateTransition(t, `Transition ${i + 1}`).errors);
      const allErrors = [...stateValidation.errors, ...transitionErrors];

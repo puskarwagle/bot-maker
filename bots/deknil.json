@@ -55,12 +55,47 @@
       "selectors": [],
       "transitions": [
         {
-          "condition": "always",
-          "next": "pause",
-          "selectors": []
+          "condition": "element_exists",
+          "next": "state_1756421820307",
+          "selectors": [
+            "input[aria-label='Search by title, skill, or company']:not([disabled])"
+          ]
         }
       ],
       "value": "https://www.linkedin.com/jobs"
+    },
+    {
+      "action": "fill",
+      "id": "state_1756421820307",
+      "selectors": [
+        "input[aria-label='Search by title, skill, or company']:not([disabled])",
+        "input.jobs-search-box__text-input[role='combobox']"
+      ],
+      "transitions": [
+        {
+          "condition": "element_exists",
+          "next": "state_1756421877733",
+          "selectors": [
+            "input[aria-label='City, state, or zip code']:not([disabled])"
+          ]
+        }
+      ],
+      "value": "Python"
+    },
+    {
+      "action": "fill",
+      "id": "state_1756421877733",
+      "selectors": [
+        "input[aria-label='City, state, or zip code']:not([disabled])",
+        "input[aria-label*='Location']:not([disabled])"
+      ],
+      "transitions": [
+        {
+          "condition": "always",
+          "next": "pause"
+        }
+      ],
+      "value": "Sydney"
     }
   ],
   "file_name": "deknil.json",
