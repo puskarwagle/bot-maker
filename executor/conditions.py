@@ -15,21 +15,28 @@ async def always(page: Page, context: dict, **kwargs):
     return True
 
 @register_condition("element_exists")
-async def element_exists(page: Page, context: dict, selectors: List[str] = None, **kwargs):
+async def element_exists(page: Page, context: dict, selectors: list[str] | str = None, timeout: int = 5000, **kwargs):
     if isinstance(selectors, str):
         selectors = [selectors]
     for s in selectors:
-        if await page.query_selector(s):
+        try:
+            await page.wait_for_selector(s, timeout=timeout)
             return True
+        except Exception:
+            continue
     return False
 
 @register_condition("element_not_exists")
-async def element_not_exists(page: Page, context: dict, selectors: List[str] = None, **kwargs):
+async def element_not_exists(page: Page, context: dict, selectors: list[str] | str = None, timeout: int = 5000, **kwargs):
     if isinstance(selectors, str):
         selectors = [selectors]
     for s in selectors:
-        if await page.query_selector(s):
+        try:
+            await page.wait_for_selector(s, timeout=timeout)
+            # if we find it within timeout, return False
             return False
+        except Exception:
+            continue
     return True
 
 @register_condition("variable_equals")

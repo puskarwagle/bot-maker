@@ -3,6 +3,26 @@
   "start_url": "https://www.linkedin.com/login",
   "states": [
     {
+      "action": "do_nothing",
+      "id": "state_1756476119340",
+      "selectors": [],
+      "transitions": [
+        {
+          "condition": "element_exists",
+          "next": "state_1756406193021",
+          "selectors": [
+            "#username, input[name='session_key'], input[aria-label='Email or phone']"
+          ]
+        },
+        {
+          "condition": "url_matches",
+          "next": "state_1756408322204",
+          "pattern": "https://www.linkedin.com/feed"
+        }
+      ],
+      "value": ""
+    },
+    {
       "action": "fill",
       "id": "state_1756406193021",
       "selectors": [
@@ -98,8 +118,8 @@
       "value": "Sydney"
     },
     {
-      "id": "state_1756424703329",
       "action": "press_enter",
+      "id": "state_1756424703329",
       "selectors": [],
       "transitions": [
         {
@@ -110,8 +130,8 @@
       "value": ""
     },
     {
-      "id": "state_1756463842683",
       "action": "wait_for",
+      "id": "state_1756463842683",
       "selectors": [
         "button[type='button'][id='searchFilter_applyWithLinkedin']"
       ],
@@ -131,6 +151,25 @@
       "action": "click",
       "selectors": [
         "button[type='button'][id='searchFilter_applyWithLinkedin']"
+      ],
+      "transitions": [
+        {
+          "condition": "element_exists",
+          "next": "state_1756475890678",
+          "selectors": [
+            "\"button:has-text('All filters')\"",
+            "\"button[aria-label='Show all filters. Clicking this button displays all available filter options.']\""
+          ]
+        }
+      ],
+      "value": ""
+    },
+    {
+      "id": "state_1756475890678",
+      "action": "click",
+      "selectors": [
+        "\"button:has-text('All filters')\"",
+        "\"button[aria-label='Show all filters. Clicking this button displays all available filter options.']\""
       ],
       "transitions": [
         {
