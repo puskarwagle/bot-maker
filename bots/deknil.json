@@ -83,8 +83,8 @@
       "value": "Python"
     },
     {
-      "id": "state_1756421877733",
       "action": "fill",
+      "id": "state_1756421877733",
       "selectors": [
         "input[aria-label='City, state, or zip code']:not([disabled])",
         "input[aria-label*='Location']:not([disabled])"
@@ -101,6 +101,37 @@
       "id": "state_1756424703329",
       "action": "press_enter",
       "selectors": [],
+      "transitions": [
+        {
+          "condition": "always",
+          "next": "state_1756463842683"
+        }
+      ],
+      "value": ""
+    },
+    {
+      "id": "state_1756463842683",
+      "action": "wait_for",
+      "selectors": [
+        "button[type='button'][id='searchFilter_applyWithLinkedin']"
+      ],
+      "transitions": [
+        {
+          "condition": "element_exists",
+          "next": "state_1756465232823",
+          "selectors": [
+            "button[type='button'][id='searchFilter_applyWithLinkedin']"
+          ]
+        }
+      ],
+      "value": ""
+    },
+    {
+      "id": "state_1756465232823",
+      "action": "click",
+      "selectors": [
+        "button[type='button'][id='searchFilter_applyWithLinkedin']"
+      ],
       "transitions": [
         {
           "condition": "always",
