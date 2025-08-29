@@ -9,6 +9,7 @@ from data.context import Context
 import asyncio
 import threading
 from playwright.async_api import async_playwright
+from executor.session import launch_persistent_context
 
 # ----------------------------- BotRunner Class -----------------------------
 class BotRunner:
@@ -26,33 +27,30 @@ class BotRunner:
         self.is_running = True
         print(f"🔹 Starting bot: {self.bot_name}, file: {self.bot_file}")
         try:
-            with open(self.bot_file, "r") as f:
-                bot_config = json.load(f)
+            context_obj = Context()
+            # Use persistent context for fullscreen
+            self.playwright, self.browser, self.page = await launch_persistent_context(self.bot_name, headless=False)
+            await self.page.set_viewport_size({"width": 1920, "height": 1080})  # force HTML scaling
 
-            async with async_playwright() as p:
-                self.browser = await p.chromium.launch(headless=False)
-                self.page = await self.browser.new_page()
+            bot_task = asyncio.create_task(
+                run_bot(self.bot_name, self.page, self.bot_file, context_obj, self._pause_event, self._stop_event)
+            )
+            stop_task = asyncio.create_task(self._wait_for_stop())
 
-                context = Context()
-                bot_task = asyncio.create_task(
-                    run_bot(self.bot_name, self.page, self.bot_file, context, self._pause_event, self._stop_event)
+            while not bot_task.done():
+                await self._pause_event.wait()
+                done, _ = await asyncio.wait(
+                    [bot_task, stop_task],
+                    timeout=0.1,
+                    return_when=asyncio.FIRST_COMPLETED,
                 )
-                stop_task = asyncio.create_task(self._wait_for_stop())
 
-                while not bot_task.done():
-                    await self._pause_event.wait()
-                    done, _ = await asyncio.wait(
-                        [bot_task, stop_task],
-                        timeout=0.1,
-                        return_when=asyncio.FIRST_COMPLETED,
-                    )
-
-                if stop_task.done():
-                    bot_task.cancel()
-                    try:
-                        await bot_task
-                    except asyncio.CancelledError:
-                        pass
+            if stop_task.done():
+                bot_task.cancel()
+                try:
+                    await bot_task
+                except asyncio.CancelledError:
+                    pass
         finally:
             if self.browser:
                 await self.browser.close()

@@ -15,6 +15,7 @@ async def launch_persistent_context(bot_name: str, headless: bool = False, user_
         user_data_dir=str(user_data_dir),
         headless=headless,
         user_agent=user_agent,
+        viewport=None,  # allow real window size
         args=[
             "--no-sandbox",
             "--disable-dev-shm-usage",
@@ -30,10 +31,12 @@ async def launch_persistent_context(bot_name: str, headless: bool = False, user_
             "--disable-infobars",
             "--lang=en-US,en",
             "--start-maximized",
+            "--window-size=1920,1080",
             "--disable-web-security",
         ],
     )
 
     page = await context.new_page()
+    await page.set_viewport_size({"width": 1920, "height": 1080})  # 🔑 force HTML scaling
 
     return playwright, context, page

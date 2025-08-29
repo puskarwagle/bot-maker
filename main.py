@@ -39,11 +39,24 @@ async def start_browser():
     """Launch Playwright browser and open dashboard tab."""
     global playwright_instance, browser_context, browser_page
     playwright_instance = await async_playwright().start()
-    browser = await playwright_instance.chromium.launch(headless=False,args=["--start-maximized"])
-    browser_context = await browser.new_context(viewport=None)
+
+    browser_context = await playwright_instance.chromium.launch_persistent_context(
+        user_data_dir="user_data/dashboard",
+        headless=False,
+        viewport=None,  # allow real window size
+        args=[
+            "--start-maximized",
+            "--window-size=1920,1080",
+        ],
+    )
+
     browser_page = await browser_context.new_page()
+    await browser_page.set_viewport_size({"width": 1920, "height": 1080})  # 🔑 force viewport scaling
     await browser_page.goto("http://localhost:5000")
     print("🌐 Dashboard loaded inside Playwright browser.")
+
+
+
 
 async def shutdown_browser():
     """Cleanly close Playwright on exit."""
