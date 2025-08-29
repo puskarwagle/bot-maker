@@ -35,9 +35,5 @@ async def launch_persistent_context(bot_name: str, headless: bool = False, user_
     )
 
     page = await context.new_page()
-    # try:
-    #     await page.set_viewport_size(None)
-    # except Exception:
-    #     await page.set_viewport_size({"width": 1920, "height": 1080})
 
     return playwright, context, page

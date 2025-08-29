@@ -5,8 +5,7 @@ import time
 from pathlib import Path
 from flask import Flask, send_from_directory
 from playwright.async_api import async_playwright
-
-from api import register_api_routes  # Our API module
+from api import register_api_routes
 
 # ----------------------------- Flask App -----------------------------
 app = Flask(
@@ -39,13 +38,10 @@ register_api_routes(app, running_bots, bot_threads)
 async def start_browser():
     """Launch Playwright browser and open dashboard tab."""
     global playwright_instance, browser_context, browser_page
-
     playwright_instance = await async_playwright().start()
-    browser = await playwright_instance.chromium.launch(headless=False)
-    browser_context = await browser.new_context()
+    browser = await playwright_instance.chromium.launch(headless=False,args=["--start-maximized"])
+    browser_context = await browser.new_context(viewport=None)
     browser_page = await browser_context.new_page()
-
-    # Open dashboard page inside Playwright
     await browser_page.goto("http://localhost:5000")
     print("🌐 Dashboard loaded inside Playwright browser.")
 
