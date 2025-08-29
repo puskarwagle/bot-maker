@@ -3,3 +3,4 @@ __pycache__/
 .vscode/
 ignoreme/
 user_data/
+logs/*
