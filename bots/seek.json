@@ -3,8 +3,8 @@
   "start_url": "https://seek.com.au",
   "states": [
     {
-      "id": "state_1756542665851",
       "action": "fill",
+      "id": "state_1756542665851",
       "selectors": [
         "input#keywords-input",
         "input[name='keywords']",
@@ -13,10 +13,38 @@
       "transitions": [
         {
           "condition": "always",
-          "next": "pause"
+          "next": "state_1756561542089"
         }
       ],
       "value": "Python"
+    },
+    {
+      "id": "state_1756561542089",
+      "action": "fill",
+      "selectors": [
+        "input[id=\"SearchBar__Where\"]"
+      ],
+      "transitions": [
+        {
+          "condition": "always",
+          "next": "state_1756562731705"
+        }
+      ],
+      "value": "Sydney"
+    },
+    {
+      "id": "state_1756562731705",
+      "action": "click",
+      "selectors": [
+        "buttion[id=\"searchButton\"]"
+      ],
+      "transitions": [
+        {
+          "condition": "always",
+          "next": "pause"
+        }
+      ],
+      "value": ""
     }
   ],
   "file_name": "seek.json",
