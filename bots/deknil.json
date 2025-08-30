@@ -1,185 +1,238 @@
 {
-  "bot_name": "deknil",
-  "start_url": "https://www.linkedin.com/login",
-  "states": [
-    {
-      "action": "do_nothing",
-      "id": "state_1756476119340",
-      "selectors": [],
-      "transitions": [
-        {
-          "condition": "element_exists",
-          "next": "state_1756406193021",
-          "selectors": [
-            "#username, input[name='session_key'], input[aria-label='Email or phone']"
-          ]
-        },
-        {
-          "condition": "url_matches",
-          "next": "state_1756408322204",
-          "pattern": "https://www.linkedin.com/feed"
-        }
-      ],
-      "value": ""
-    },
-    {
-      "action": "fill",
-      "id": "state_1756406193021",
-      "selectors": [
-        "#username",
-        "input[name='session_key']",
-        "input[aria-label='Email or phone']"
-      ],
-      "transitions": [
-        {
-          "condition": "always",
-          "next": "state_1756397927429"
-        }
-      ],
-      "value": "puskarwagle17@gmail.com"
-    },
-    {
-      "action": "fill",
-      "id": "state_1756397927429",
-      "selectors": [
-        "input[type='password'][name='session_password']"
-      ],
-      "transitions": [
-        {
-          "condition": "always",
-          "next": "state_1756398025686"
-        }
-      ],
-      "value": "MeltBanana1"
-    },
-    {
-      "action": "click",
-      "id": "state_1756398025686",
-      "selectors": [
-        "button[type='submit'][aria-label='Sign in']",
-        "button.btn__primary--large.from__button--floating",
-        "button[data-litms-control-urn='login-submit']",
-        "button:has-text('Sign in')"
-      ],
-      "transitions": [
-        {
-          "condition": "url_matches",
-          "next": "state_1756408322204",
-          "pattern": "https://www.linkedin.com/feed"
-        }
-      ]
-    },
-    {
-      "action": "navigate_to",
-      "id": "state_1756408322204",
-      "selectors": [],
-      "transitions": [
-        {
-          "condition": "element_exists",
-          "next": "state_1756421820307",
-          "selectors": [
-            "input[aria-label='Search by title, skill, or company']:not([disabled])"
-          ]
-        }
-      ],
-      "value": "https://www.linkedin.com/jobs"
-    },
-    {
-      "action": "fill",
-      "id": "state_1756421820307",
-      "selectors": [
-        "input[aria-label='Search by title, skill, or company']:not([disabled])",
-        "input.jobs-search-box__text-input[role='combobox']"
-      ],
-      "transitions": [
-        {
-          "condition": "element_exists",
-          "next": "state_1756421877733",
-          "selectors": [
-            "input[aria-label='City, state, or zip code']:not([disabled])"
-          ]
-        }
-      ],
-      "value": "Python"
-    },
-    {
-      "action": "fill",
-      "id": "state_1756421877733",
-      "selectors": [
-        "input[aria-label='City, state, or zip code']:not([disabled])",
-        "input[aria-label*='Location']:not([disabled])"
-      ],
-      "transitions": [
-        {
-          "condition": "always",
-          "next": "state_1756424703329"
-        }
-      ],
-      "value": "Sydney"
-    },
-    {
-      "action": "press_enter",
-      "id": "state_1756424703329",
-      "selectors": [],
-      "transitions": [
-        {
-          "condition": "always",
-          "next": "state_1756463842683"
-        }
-      ],
-      "value": ""
-    },
-    {
-      "action": "wait_for",
-      "id": "state_1756463842683",
-      "selectors": [
-        "button[type='button'][id='searchFilter_applyWithLinkedin']"
-      ],
-      "transitions": [
-        {
-          "condition": "element_exists",
-          "next": "state_1756465232823",
-          "selectors": [
-            "button[type='button'][id='searchFilter_applyWithLinkedin']"
-          ]
-        }
-      ],
-      "value": ""
-    },
-    {
-      "id": "state_1756465232823",
-      "action": "click",
-      "selectors": [
-        "button[type='button'][id='searchFilter_applyWithLinkedin']"
-      ],
-      "transitions": [
-        {
-          "condition": "element_exists",
-          "next": "state_1756475890678",
-          "selectors": [
-            "\"button:has-text('All filters')\"",
-            "\"button[aria-label='Show all filters. Clicking this button displays all available filter options.']\""
-          ]
-        }
-      ],
-      "value": ""
-    },
-    {
-      "id": "state_1756475890678",
-      "action": "click",
-      "selectors": [
-        "\"button:has-text('All filters')\"",
-        "\"button[aria-label='Show all filters. Clicking this button displays all available filter options.']\""
-      ],
-      "transitions": [
-        {
-          "condition": "always",
-          "next": "pause"
-        }
-      ],
-      "value": ""
-    }
-  ],
-  "file_name": "deknil.json",
-  "editingStateIndex": null
-}
+    "bot_name": "deknil",
+    "start_url": "https://www.linkedin.com/login",
+    "states": [
+      {
+        "action": "do_nothing",
+        "id": "state_1756476119340",
+        "selectors": [],
+        "transitions": [
+          {
+            "condition": "element_exists",
+            "next": "state_1756406193021",
+            "selectors": [
+              "#username, input[name='session_key'], input[aria-label='Email or phone']"
+            ]
+          },
+          {
+            "condition": "url_matches",
+            "next": "state_1756408322204",
+            "pattern": "https://www.linkedin.com/feed"
+          }
+        ],
+        "value": ""
+      },
+      {
+        "action": "fill",
+        "id": "state_1756406193021",
+        "selectors": [
+          "#username",
+          "input[name='session_key']",
+          "input[aria-label='Email or phone']"
+        ],
+        "transitions": [
+          {
+            "condition": "always",
+            "next": "state_1756397927429"
+          }
+        ],
+        "value": "puskarwagle17@gmail.com"
+      },
+      {
+        "action": "fill",
+        "id": "state_1756397927429",
+        "selectors": [
+          "input[type='password'][name='session_password']"
+        ],
+        "transitions": [
+          {
+            "condition": "always",
+            "next": "state_1756398025686"
+          }
+        ],
+        "value": "MeltBanana1"
+      },
+      {
+        "action": "click",
+        "id": "state_1756398025686",
+        "selectors": [
+          "button[type='submit'][aria-label='Sign in']",
+          "button.btn__primary--large.from__button--floating",
+          "button[data-litms-control-urn='login-submit']",
+          "button:has-text('Sign in')"
+        ],
+        "transitions": [
+          {
+            "condition": "url_matches",
+            "next": "state_1756408322204",
+            "pattern": "https://www.linkedin.com/feed"
+          }
+        ]
+      },
+      {
+        "action": "navigate_to",
+        "id": "state_1756408322204",
+        "selectors": [],
+        "transitions": [
+          {
+            "condition": "wait_for_element",
+            "next": "state_1756421877733",
+            "selectors": [
+              "input[aria-label='Search by title, skill, or company']:not([disabled])"
+            ],
+            "timeout": 15000
+          }
+        ],
+        "value": "https://www.linkedin.com/jobs"
+      },
+      {
+        "action": "fill",
+        "id": "state_1756421877733",
+        "selectors": [
+          "input[aria-label='City, state, or zip code']:not([disabled])",
+          "input[aria-label*='Location']:not([disabled])"
+        ],
+        "transitions": [
+          {
+            "condition": "always",
+            "next": "state_1756421820307"
+          }
+        ],
+        "value": "Sydney"
+      },
+      {
+        "action": "fill",
+        "id": "state_1756421820307",
+        "selectors": [
+          "input[aria-label='Search by title, skill, or company']:not([disabled])",
+          "input.jobs-search-box__text-input[role='combobox']"
+        ],
+        "transitions": [
+          {
+            "condition": "wait_for_element",
+            "next": "state_1756424703329",
+            "selectors": [
+              "input[aria-label='City, state, or zip code']:not([disabled])"
+            ],
+            "timeout": 15000
+          }
+        ],
+        "value": "Python"
+      },
+      {
+        "action": "press_enter",
+        "id": "state_1756424703329",
+        "selectors": [],
+        "transitions": [
+          {
+            "condition": "wait_for_element",
+            "next": "state_1756465232823",
+            "selectors": [
+              "button[type='button'][id='searchFilter_applyWithLinkedin']"
+            ],
+            "timeout": 20000
+          }
+        ],
+        "value": ""
+      },
+      {
+        "id": "state_1756465232823",
+        "action": "click",
+        "selectors": [
+          "button[type='button'][id='searchFilter_applyWithLinkedin']"
+        ],
+        "transitions": [
+          {
+            "condition": "wait_for_element",
+            "next": "state_1756475890678",
+            "selectors": [
+              "button:has-text('All filters')",
+              "button[aria-label='Show all filters. Clicking this button displays all available filter options.']"
+            ],
+            "timeout": 10000
+          }
+        ],
+        "value": ""
+      },
+      {
+        "action": "click",
+        "id": "state_1756475890678",
+        "selectors": [
+          "button:has-text('All filters')",
+          "button[aria-label='Show all filters. Clicking this button displays all available filter options.']"
+        ],
+        "transitions": [
+          {
+            "condition": "wait_for_element",
+            "next": "state_1756475890679",
+            "selectors": [
+              "input[name='date-posted-filter-value'][value='r604800']"
+            ],
+            "timeout": 5000
+          }
+        ],
+        "value": ""
+      },
+      {
+        "action": "click",
+        "id": "state_1756475890679",
+        "selectors": [
+          "input[name='date-posted-filter-value'][value='r604800']"
+        ],
+        "transitions": [
+          {
+            "condition": "always",
+            "next": "state_1756475890680"
+          }
+        ],
+        "value": ""
+      },
+      {
+        "action": "click",
+        "id": "state_1756475890680",
+        "selectors": [
+          "input[name='experience-level-filter-value'][value='2']"
+        ],
+        "transitions": [
+          {
+            "condition": "always",
+            "next": "state_1756475890681"
+          }
+        ],
+        "value": ""
+      },
+      {
+        "action": "click",
+        "id": "state_1756475890681",
+        "selectors": [
+          "input[name='experience-level-filter-value'][value='4']"
+        ],
+        "transitions": [
+          {
+            "condition": "always",
+            "next": "state_1756475890682"
+          }
+        ],
+        "value": ""
+      },
+      {
+        "action": "click",
+        "id": "state_1756475890682",
+        "selectors": [
+          "button:has-text('Show results')",
+          "button[aria-label='Apply current filters to show results']",
+          "button.artdeco-button--primary"
+        ],
+        "transitions": [
+          {
+            "condition": "always",
+            "next": "pause"
+          }
+        ],
+        "value": ""
+      }
+    ],
+    "file_name": "deknil.json",
+    "editingStateIndex": null
+  }
+  

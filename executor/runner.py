@@ -27,6 +27,17 @@ async def run_bot(bot_name: str, page, bot_file, context, pause_event: asyncio.E
     await asyncio.sleep(1)
     print("✅ Page loaded, starting states execution")
 
+    # -------------------- Handle case: no states --------------------
+    if not state_order:
+        print("ℹ️ No states defined in bot. Entering PAUSE mode...")
+        pause_event.clear()  # start paused by default
+        while True:
+            if stop_event.is_set():
+                print("🛑 STOP received during idle pause, exiting")
+                await page.context.close()
+                return
+            await asyncio.sleep(0.1)
+
     # -------------------- State Execution Loop --------------------
     while current_state_index < len(state_order):
         state = state_order[current_state_index]
@@ -46,7 +57,7 @@ async def run_bot(bot_name: str, page, bot_file, context, pause_event: asyncio.E
                 await page.context.close()
                 # await page.browser.close()
                 return
-            await asyncio.sleep(0.1)  # short sleep, responsive to stop
+            await asyncio.sleep(0.1)
 
         print(f"\n🔹 Executing state {state_id} -> {state['action']}")
 

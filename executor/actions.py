@@ -94,14 +94,3 @@ async def hover(page: Page, state: dict, context: dict):
             print(f"Hovered over {s}")
             return
     raise Exception(f"No working selector for hover in state {state['id']}")
-
-@register_action("wait_for")
-async def wait_for(page: Page, state: dict, context: dict):
-    selectors = state.get("selectors") or []
-    if not selectors:
-        raise Exception(f"No selectors provided for wait_for in state {state['id']}")
-    selector = selectors[0]
-    default_timeout = 50000
-    timeout = state.get("timeout", default_timeout)
-    await page.wait_for_selector(selector, timeout=timeout)
-    print(f"Waited for {selector} (timeout: {timeout}ms)")

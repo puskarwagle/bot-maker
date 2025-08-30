@@ -1,0 +1,24 @@
+{
+  "bot_name": "seek",
+  "start_url": "https://seek.com.au",
+  "states": [
+    {
+      "id": "state_1756542665851",
+      "action": "fill",
+      "selectors": [
+        "input#keywords-input",
+        "input[name='keywords']",
+        "input[placeholder='Enter keywords']"
+      ],
+      "transitions": [
+        {
+          "condition": "always",
+          "next": "pause"
+        }
+      ],
+      "value": "Python"
+    }
+  ],
+  "file_name": "seek.json",
+  "editingStateIndex": null
+}

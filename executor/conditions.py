@@ -14,8 +14,12 @@ def register_condition(name):
 async def always(page: Page, context: dict, **kwargs):
     return True
 
-@register_condition("element_exists")
-async def element_exists(page: Page, context: dict, selectors: list[str] | str = None, timeout: int = 5000, **kwargs):
+@register_condition("wait_for_element")
+async def wait_for_element(page: Page, context: dict, selectors: list[str] | str = None, timeout: int = 10000, **kwargs):
+    """
+    Wait until one of the selectors exists (blocking condition).
+    Returns True if found within timeout, False otherwise.
+    """
     if isinstance(selectors, str):
         selectors = [selectors]
     for s in selectors:
@@ -26,18 +30,23 @@ async def element_exists(page: Page, context: dict, selectors: list[str] | str =
             continue
     return False
 
-@register_condition("element_not_exists")
-async def element_not_exists(page: Page, context: dict, selectors: list[str] | str = None, timeout: int = 5000, **kwargs):
+
+@register_condition("wait_for_element_not_exists")
+async def wait_for_element_not_exists(page: Page, context: dict, selectors: list[str] | str = None, timeout: int = 10000, **kwargs):
+    """
+    Wait until all of the selectors disappear from the DOM.
+    Returns True if gone within timeout, False otherwise.
+    """
     if isinstance(selectors, str):
         selectors = [selectors]
     for s in selectors:
         try:
-            await page.wait_for_selector(s, timeout=timeout)
-            # if we find it within timeout, return False
-            return False
+            await page.wait_for_selector(s, timeout=timeout, state="detached")
         except Exception:
-            continue
+            # still not gone within timeout
+            return False
     return True
+
 
 @register_condition("variable_equals")
 async def variable_equals(page: Page, context: dict, var=None, value=None, **kwargs):
