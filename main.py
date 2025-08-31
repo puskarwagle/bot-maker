@@ -77,24 +77,17 @@ def main():
     Path("bots").mkdir(exist_ok=True)
     Path("user_data").mkdir(exist_ok=True)
 
-    # Start Flask in a separate thread so Playwright can run in main loop
-    def run_flask():
-        app.run(debug=False, host="0.0.0.0", port=5000, use_reloader=False)
-
-    flask_thread = threading.Thread(target=run_flask)
-    flask_thread.daemon = True
-    flask_thread.start()
-
-    # Start Playwright browser and load dashboard
+    # Start Flask server directly
+    print("🌐 Starting Flask server on http://localhost:5001")
+    print("📱 You can access the dashboard at: http://localhost:5001")
+    print("🛑 Press Ctrl+C to stop the server")
+    
     try:
-        asyncio.run(start_browser())
-        # Keep the main thread alive while Flask + Playwright run
-        while True:
-            time.sleep(1)
+        app.run(debug=False, host="0.0.0.0", port=5001, use_reloader=False)
     except KeyboardInterrupt:
         print("⌨️ Keyboard interrupt received, shutting down...")
     finally:
-        asyncio.run(shutdown_browser())
+        print("🛑 Server stopped.")
 
 if __name__ == "__main__":
     main()

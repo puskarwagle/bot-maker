@@ -29,8 +29,19 @@ class BotRunner:
         try:
             context_obj = Context()
             # Use persistent context for fullscreen
-            self.playwright, self.browser, self.page = await launch_persistent_context(self.bot_name, headless=False)
-            await self.page.set_viewport_size({"width": 1920, "height": 1080})  # force HTML scaling
+            try:
+                self.playwright, self.browser, self.page = await launch_persistent_context(self.bot_name, headless=False)
+                print(f"✅ Browser launched successfully for {self.bot_name}")
+            except Exception as e:
+                print(f"❌ Failed to launch browser in non-headless mode for {self.bot_name}: {e}")
+                print("🔄 Trying headless mode as fallback...")
+                try:
+                    self.playwright, self.browser, self.page = await launch_persistent_context(self.bot_name, headless=True)
+                    print(f"✅ Browser launched successfully in headless mode for {self.bot_name}")
+                except Exception as e2:
+                    print(f"❌ Failed to launch browser in headless mode for {self.bot_name}: {e2}")
+                    self.is_running = False
+                    return
 
             bot_task = asyncio.create_task(
                 run_bot(self.bot_name, self.page, self.bot_file, context_obj, self._pause_event, self._stop_event)
@@ -70,8 +81,7 @@ class BotRunner:
     async def _wait_for_stop(self):
         await self._stop_event.wait()
 
-def run_bot_async(bot_name, bot_file):
-    from main import bot_threads, running_bots  # lazy import here too
+def run_bot_async(bot_name, bot_file, running_bots, bot_threads):
     def run_in_thread():
         runner = BotRunner(bot_name, bot_file)
         running_bots[bot_name] = runner
@@ -85,9 +95,6 @@ def run_bot_async(bot_name, bot_file):
 
 # ----------------------------- Register API Routes -----------------------------
 def register_api_routes(app, running_bots, bot_threads):
-
-    # ✅ Lazy import to avoid circular dependency
-    from main import running_bots, bot_threads
 
     # ----------- Bot Management -----------
     @app.route("/api/bots", methods=["GET"])
@@ -159,7 +166,7 @@ def register_api_routes(app, running_bots, bot_threads):
         if not bot_file:
             return jsonify({"error": "Bot not found"}), 404
 
-        run_bot_async(bot_name, bot_file)
+        run_bot_async(bot_name, bot_file, running_bots, bot_threads)
         return jsonify({"message": f"Bot {bot_name} started"})
 
 # ----------------------------- START PAUSE RESUME  -----------------------------

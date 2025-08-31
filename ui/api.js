@@ -32,7 +32,10 @@
   
   async function deleteBot(file) {
     console.log("delete called");
-    const res = await fetch(`/api/bots/${encodeURIComponent(file)}`, { method: 'DELETE' });
+    const res = await fetch(`/api/bots/${encodeURIComponent(file)}`, { 
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' }
+    });
     if (!res.ok) {
       throw new Error(`Failed to delete bot: ${res.statusText}`);
     }
@@ -40,22 +43,34 @@
   }
   
   async function startBotAPI(botName) {
-    const res = await fetch(`/api/bots/${encodeURIComponent(botName)}/start`, { method: 'POST' });
+    const res = await fetch(`/api/bots/${encodeURIComponent(botName)}/start`, { 
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' }
+    });
     return res.json();
   }
   
   async function stopBotAPI(botName) {
-    const res = await fetch(`/api/bots/${encodeURIComponent(botName)}/stop`, { method: 'POST' });
+    const res = await fetch(`/api/bots/${encodeURIComponent(botName)}/stop`, { 
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' }
+    });
     return res.json();
   }
   
   async function pauseBotAPI(botName) {
-    const res = await fetch(`/api/bots/${encodeURIComponent(botName)}/pause`, { method: 'POST' });
+    const res = await fetch(`/api/bots/${encodeURIComponent(botName)}/pause`, { 
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' }
+    });
     return res.json();
   }
   
   async function resumeBotAPI(botName) {
-    const res = await fetch(`/api/bots/${encodeURIComponent(botName)}/resume`, { method: 'POST' });
+    const res = await fetch(`/api/bots/${encodeURIComponent(botName)}/resume`, { 
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' }
+    });
     return res.json();
   }
   

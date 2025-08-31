@@ -4,3 +4,4 @@ __pycache__/
 ignoreme/
 user_data/
 logs/*
+.venv/

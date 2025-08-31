@@ -40,8 +40,11 @@
   }
   
   async function startBotAPI(botName) {
+    console.log('API: Starting bot with name:', botName);
     const res = await fetch(`/api/bots/${encodeURIComponent(botName)}/start`, { method: 'POST' });
-    return res.json();
+    const result = await res.json();
+    console.log('API: Start bot result:', result);
+    return result;
   }
   
   async function stopBotAPI(botName) {

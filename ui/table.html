@@ -287,6 +287,53 @@
             color: #666;
             font-size: 12px;
             margin-top: 10px;
+            padding: 8px 12px;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .status.saving {
+            background-color: #1a1a2a;
+            color: #00ffff;
+            border: 1px solid #00ffff;
+        }
+
+        .status.saving::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, #00ffff, #00cccc);
+            animation: savingProgress 2s ease-in-out forwards;
+        }
+
+        .status.saved {
+            background-color: #1a3a1a;
+            color: #00ff00;
+            border: 1px solid #00ff00;
+            box-shadow: 0 0 10px rgba(0, 255, 0, 0.3);
+            animation: savedPulse 0.5s ease-in-out;
+        }
+
+        @keyframes savedPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes savingProgress {
+            0% { width: 0%; }
+            100% { width: 100%; }
+        }
+
+        .status.error {
+            background-color: #3a1a1a;
+            color: #ff6b6b;
+            border: 1px solid #ff6b6b;
         }
 
         .hidden {
@@ -366,6 +413,12 @@
         </div>
         <div class="controls">
             <button class="btn" onclick="addState()">➕ Add State</button>
+            <button class="btn" onclick="manualSave()">💾 Save Bot</button>
+            <button class="btn" id="runBotBtn" onclick="runBot()" style="display: none;">▶️ Run Bot</button>
+            <button class="btn danger" id="stopBotBtn" onclick="stopBot()" style="display: none;">⏹️ Stop Bot</button>
+            <button class="btn" id="pauseBotBtn" onclick="pauseBot()" style="display: none;">⏸️ Pause</button>
+            <button class="btn" id="resumeBotBtn" onclick="resumeBot()" style="display: none;">▶️ Resume</button>
+            <button class="btn danger" id="deleteBotBtn" onclick="deleteCurrentBot()" style="display: none;">🗑️ Delete Bot</button>
         </div>
     </div>
 
@@ -410,6 +463,10 @@
             loadBotFile,
             saveBot,
             deleteBot,
+            startBotAPI,
+            stopBotAPI,
+            pauseBotAPI,
+            resumeBotAPI,
             fetchActions,
             fetchConditions
         } from './api.js';
@@ -421,9 +478,22 @@
             loadBotFile,
             saveBot,
             deleteBot,
+            startBotAPI,
+            stopBotAPI,
+            pauseBotAPI,
+            resumeBotAPI,
             fetchActions,
             fetchConditions
         };
+
+        // Also make individual functions available globally for backward compatibility
+        window.startBotAPI = startBotAPI;
+        window.stopBotAPI = stopBotAPI;
+        window.pauseBotAPI = pauseBotAPI;
+        window.resumeBotAPI = resumeBotAPI;
+        window.deleteBot = deleteBot;
+
+        console.log('API module loaded successfully:', window.apiModule);
 
         // Initialize the page after the module loads
         window.initializePage();
@@ -614,6 +684,9 @@
                 document.getElementById('tableView').style.display = 'block';
                 document.getElementById('status').style.display = 'block';
                 
+                // Show bot control buttons
+                updateBotControlButtons();
+                
                 renderCurrentView();
                 updateStatus(`Loaded ${stateData.states.length} states from ${fileName}`);
             } catch (error) {
@@ -647,6 +720,8 @@
             states: [],
             file_name: ""
         };
+
+        let botStatus = 'stopped'; // 'stopped', 'running', 'paused'
 
         let currentView = 'table';
         let stateIndex = 0;
@@ -718,6 +793,7 @@
             });
 
             renderCurrentView();
+            autoSave(); // Trigger auto-save when alias changes
         }
 
         function backfillAliases() {
@@ -728,8 +804,34 @@
             });
         }
 
-        function updateStatus(msg) {
-            document.getElementById('status').textContent = msg;
+        function updateStatus(msg, type = 'normal') {
+            const statusElement = document.getElementById('status');
+            statusElement.textContent = msg;
+            
+            console.log('updateStatus called:', msg, type); // Debug log
+            
+            // Remove existing classes
+            statusElement.classList.remove('saved', 'error', 'saving');
+            
+            // Add appropriate class based on type
+            if (type === 'saved') {
+                statusElement.classList.add('saved');
+                console.log('Added saved class'); // Debug log
+                // Remove the saved class after 3 seconds
+                setTimeout(() => {
+                    statusElement.classList.remove('saved');
+                }, 3000);
+            } else if (type === 'error') {
+                statusElement.classList.add('error');
+                console.log('Added error class'); // Debug log
+                // Remove the error class after 5 seconds
+                setTimeout(() => {
+                    statusElement.classList.remove('error');
+                }, 5000);
+            } else if (type === 'saving') {
+                statusElement.classList.add('saving');
+                console.log('Added saving class'); // Debug log
+            }
         }
 
         function generateStateId() {
@@ -792,20 +894,85 @@
         // Auto-save functionality
         let autoSaveTimeout;
         async function autoSave() {
-            if (!stateData.file_name) return; // Don't auto-save if no file loaded
+            if (!stateData.file_name) {
+                console.log('Auto-save skipped: no file_name');
+                return; // Don't auto-save if no file loaded
+            }
             
+            console.log('Auto-save triggered for file:', stateData.file_name);
             clearTimeout(autoSaveTimeout);
             autoSaveTimeout = setTimeout(async () => {
                 try {
+                    // Show saving progress with percentage
+                    let progress = 0;
+                    const progressInterval = setInterval(() => {
+                        progress += 10;
+                        if (progress <= 90) {
+                            updateStatus(`Saving... ${progress}%`, 'saving');
+                        }
+                    }, 200);
+                    
                     stateData.bot_name = document.getElementById('botAlias').value || 'bot';
+                    console.log('Auto-saving bot:', stateData);
                     const result = await window.apiModule.saveBot(stateData);
-                    if (!result.error) {
-                        updateStatus('Auto-saved ✓');
-                    }
+                    
+                    clearInterval(progressInterval);
+                    updateStatus('Saving... 100%', 'saving');
+                    
+                    // Small delay to show 100% before success
+                    setTimeout(() => {
+                        if (!result.error) {
+                            updateStatus('Auto-saved ✓', 'saved');
+                            console.log('Auto-save successful');
+                        } else {
+                            updateStatus(`Auto-save failed: ${result.error}`, 'error');
+                            console.error('Auto-save error:', result.error);
+                        }
+                    }, 200);
                 } catch (error) {
                     console.error('Auto-save failed:', error);
+                    updateStatus(`Auto-save failed: ${error.message}`, 'error');
                 }
             }, 1000); // Wait 1 second after last change
+        }
+
+        // Manual save function
+        async function manualSave() {
+            if (!stateData.file_name) {
+                alert('Please save the bot first before making changes.');
+                return;
+            }
+            
+            try {
+                // Show saving progress with percentage
+                let progress = 0;
+                const progressInterval = setInterval(() => {
+                    progress += 10;
+                    if (progress <= 90) {
+                        updateStatus(`Saving... ${progress}%`, 'saving');
+                    }
+                }, 200);
+                
+                stateData.bot_name = document.getElementById('botAlias').value || 'bot';
+                console.log('Manually saving bot:', stateData);
+                const result = await window.apiModule.saveBot(stateData);
+                
+                clearInterval(progressInterval);
+                updateStatus('Saving... 100%', 'saving');
+                
+                // Small delay to show 100% before success
+                setTimeout(() => {
+                    if (!result.error) {
+                        updateStatus('Bot saved successfully ✓', 'saved');
+                    } else {
+                        updateStatus(`Save failed: ${result.error}`, 'error');
+                        console.error('Save error:', result.error);
+                    }
+                }, 200);
+            } catch (error) {
+                console.error('Manual save failed:', error);
+                updateStatus(`Save failed: ${error.message}`, 'error');
+            }
         }
 
         function removeState(index) {
@@ -813,6 +980,7 @@
                 stateData.states.splice(index, 1);
                 renderCurrentView();
                 updateStatus('State deleted');
+                autoSave(); // Trigger auto-save when state is deleted
             }
         }
 
@@ -824,16 +992,19 @@
             };
             stateData.states[stateIndex].transitions.push(newTransition);
             renderCurrentView();
+            autoSave(); // Trigger auto-save when transition is added
         }
 
         function removeTransition(stateIndex, transitionIndex) {
             stateData.states[stateIndex].transitions.splice(transitionIndex, 1);
             renderCurrentView();
+            autoSave(); // Trigger auto-save when transition is removed
         }
 
         function updateStateProperty(stateIndex, property, value) {
             stateData.states[stateIndex][property] = value;
             if (currentView === 'json') renderCurrentView();
+            autoSave(); // Trigger auto-save when state properties change
         }
 
         function updateTransitionProperty(stateIndex, transitionIndex, property, value) {
@@ -845,6 +1016,7 @@
                 }
             }
             stateData.states[stateIndex].transitions[transitionIndex][property] = value;
+            autoSave(); // Trigger auto-save when transition properties change
         }
 
         function switchView(view, evt) {
@@ -934,6 +1106,7 @@
                     if (action === state.action) option.selected = true;
                     actionSelect.appendChild(option);
                 });
+                actionSelect.onclick = (e) => e.stopPropagation(); // Prevent row click
                 actionSelect.onchange = (e) => updateStateProperty(index, 'action', e.target.value);
                 actionCell.appendChild(actionSelect);
                 row.appendChild(actionCell);
@@ -943,6 +1116,7 @@
                 const valueInput = document.createElement('input');
                 valueInput.className = 'value-input';
                 valueInput.value = state.value || '';
+                valueInput.onclick = (e) => e.stopPropagation(); // Prevent row click
                 valueInput.onchange = (e) => updateStateProperty(index, 'value', e.target.value);
                 valueCell.appendChild(valueInput);
                 row.appendChild(valueCell);
@@ -953,6 +1127,7 @@
                 selectorsTextarea.className = 'selector-input';
                 selectorsTextarea.value = (state.selectors || []).join('\n');
                 selectorsTextarea.rows = 2;
+                selectorsTextarea.onclick = (e) => e.stopPropagation(); // Prevent row click
                 selectorsTextarea.onchange = (e) => {
                     const selectors = e.target.value.split('\n').filter(s => s.trim());
                     updateStateProperty(index, 'selectors', selectors);
@@ -975,6 +1150,7 @@
                         if (condition === transition.condition) option.selected = true;
                         conditionSelect.appendChild(option);
                     });
+                    conditionSelect.onclick = (e) => e.stopPropagation(); // Prevent row click
                     conditionSelect.onchange = (e) => updateTransitionProperty(index, tIndex, 'condition', e.target.value);
 
                     const arrow = document.createElement('span');
@@ -985,6 +1161,7 @@
                     nextStateInput.className = 'next-state-select';
                     nextStateInput.value = transition.next === 'pause' ? 'pause' : getStateAlias(transition.next) || '';
                     nextStateInput.placeholder = 'next_state_alias';
+                    nextStateInput.onclick = (e) => e.stopPropagation(); // Prevent row click
                     nextStateInput.onchange = (e) => updateTransitionProperty(index, tIndex, 'next', e.target.value);
 
                     // Conditional parameter field (always shown)
@@ -993,12 +1170,16 @@
                     conditionalParamInput.value = transition.conditional_parameter || '';
                     conditionalParamInput.placeholder = 'conditional_parameter';
                     conditionalParamInput.style.width = '120px';
+                    conditionalParamInput.onclick = (e) => e.stopPropagation(); // Prevent row click
                     conditionalParamInput.onchange = (e) => updateTransitionProperty(index, tIndex, 'conditional_parameter', e.target.value);
 
                     const removeBtn = document.createElement('button');
                     removeBtn.className = 'remove-transition';
                     removeBtn.textContent = '✕';
-                    removeBtn.onclick = () => removeTransition(index, tIndex);
+                    removeBtn.onclick = (e) => {
+                        e.stopPropagation(); // Prevent row click
+                        removeTransition(index, tIndex);
+                    };
 
                     transitionDiv.appendChild(conditionSelect);
                     transitionDiv.appendChild(arrow);
@@ -1013,7 +1194,10 @@
                 const addTransitionBtn = document.createElement('button');
                 addTransitionBtn.className = 'add-transition';
                 addTransitionBtn.textContent = '+ Transition';
-                addTransitionBtn.onclick = () => addTransition(index);
+                addTransitionBtn.onclick = (e) => {
+                    e.stopPropagation(); // Prevent row click
+                    addTransition(index);
+                };
                 transitionsCell.appendChild(addTransitionBtn);
 
                 row.appendChild(transitionsCell);
@@ -1060,6 +1244,7 @@
                     aliasInput.style.color = '#00ffff';
                     aliasInput.style.width = '100px';
                     aliasInput.value = getStateAlias(state.id);
+                    aliasInput.onclick = (e) => e.stopPropagation(); // Prevent node click
                     aliasInput.onchange = (e) => updateStateAlias(index, e.target.value);
 
                     const actionSelect = document.createElement('select');
@@ -1073,6 +1258,7 @@
                         if (action === state.action) option.selected = true;
                         actionSelect.appendChild(option);
                     });
+                    actionSelect.onclick = (e) => e.stopPropagation(); // Prevent node click
                     actionSelect.onchange = (e) => updateStateProperty(index, 'action', e.target.value);
 
                     const valueInput = document.createElement('input');
@@ -1080,6 +1266,7 @@
                     valueInput.style.background = '#2a2a3a';
                     valueInput.value = state.value || '';
                     valueInput.placeholder = 'value';
+                    valueInput.onclick = (e) => e.stopPropagation(); // Prevent node click
                     valueInput.onchange = (e) => updateStateProperty(index, 'value', e.target.value);
 
                     title.appendChild(document.createTextNode('['));
@@ -1121,6 +1308,7 @@
                     selectorsTextarea.value = (state.selectors || []).join('\n');
                     selectorsTextarea.rows = 3;
                     selectorsTextarea.placeholder = 'Enter selectors (one per line)';
+                    selectorsTextarea.onclick = (e) => e.stopPropagation(); // Prevent node click
                     selectorsTextarea.onchange = (e) => {
                         const selectors = e.target.value.split('\n').filter(s => s.trim());
                         updateStateProperty(index, 'selectors', selectors);
@@ -1171,6 +1359,7 @@
                             if (condition === transition.condition) option.selected = true;
                             conditionSelect.appendChild(option);
                         });
+                        conditionSelect.onclick = (e) => e.stopPropagation(); // Prevent node click
                         conditionSelect.onchange = (e) => updateTransitionProperty(index, tIndex, 'condition', e.target.value);
 
                         const nextStateInput = document.createElement('input');
@@ -1178,6 +1367,7 @@
                         nextStateInput.style.background = '#1a1a2a';
                         nextStateInput.value = transition.next === 'pause' ? 'pause' : getStateAlias(transition.next) || '';
                         nextStateInput.placeholder = 'next_alias';
+                        nextStateInput.onclick = (e) => e.stopPropagation(); // Prevent node click
                         nextStateInput.onchange = (e) => updateTransitionProperty(index, tIndex, 'next', e.target.value);
 
                         const conditionalParamInput = document.createElement('input');
@@ -1185,6 +1375,7 @@
                         conditionalParamInput.style.background = '#1a1a2a';
                         conditionalParamInput.value = transition.conditional_parameter || '';
                         conditionalParamInput.placeholder = 'param';
+                        conditionalParamInput.onclick = (e) => e.stopPropagation(); // Prevent node click
                         conditionalParamInput.onchange = (e) => updateTransitionProperty(index, tIndex, 'conditional_parameter', e.target.value);
 
                         const removeBtn = document.createElement('button');
@@ -1233,6 +1424,170 @@
                 node.appendChild(transitionsDiv);
                 flowView.appendChild(node);
             });
+        }
+
+        // Bot control functions
+        async function runBot() {
+            if (!stateData.file_name) {
+                alert('Please save the bot first before running it.');
+                return;
+            }
+            
+            console.log('Starting bot with data:', stateData);
+            try {
+                const botName = stateData.bot_name || stateData.file_name.replace('.json', '');
+                console.log('Using bot name:', botName);
+                const result = await window.apiModule.startBotAPI(botName);
+                
+                if (result.error) {
+                    alert(`Error starting bot: ${result.error}`);
+                    return;
+                }
+                
+                botStatus = 'running';
+                updateBotControlButtons();
+                updateStatus(`Bot started successfully! Status: ${result.status || 'running'}`);
+            } catch (error) {
+                console.error('Error starting bot:', error);
+                alert('Failed to start bot. Please check the console for details.');
+            }
+        }
+
+        async function stopBot() {
+            if (!stateData.file_name) return;
+            
+            try {
+                const botName = stateData.bot_name || stateData.file_name.replace('.json', '');
+                const result = await window.apiModule.stopBotAPI(botName);
+                
+                if (result.error) {
+                    alert(`Error stopping bot: ${result.error}`);
+                    return;
+                }
+                
+                botStatus = 'stopped';
+                updateBotControlButtons();
+                updateStatus(`Bot stopped successfully! Status: ${result.status || 'stopped'}`);
+            } catch (error) {
+                console.error('Error stopping bot:', error);
+                alert('Failed to stop bot. Please check the console for details.');
+            }
+        }
+
+        async function pauseBot() {
+            if (!stateData.file_name) return;
+            
+            try {
+                const botName = stateData.bot_name || stateData.file_name.replace('.json', '');
+                const result = await window.apiModule.pauseBotAPI(botName);
+                
+                if (result.error) {
+                    alert(`Error pausing bot: ${result.error}`);
+                    return;
+                }
+                
+                botStatus = 'paused';
+                updateBotControlButtons();
+                updateStatus(`Bot paused successfully! Status: ${result.status || 'paused'}`);
+            } catch (error) {
+                console.error('Error pausing bot:', error);
+                alert('Failed to pause bot. Please check the console for details.');
+            }
+        }
+
+        async function resumeBot() {
+            if (!stateData.file_name) return;
+            
+            try {
+                const botName = stateData.bot_name || stateData.file_name.replace('.json', '');
+                const result = await window.apiModule.resumeBotAPI(botName);
+                
+                if (result.error) {
+                    alert(`Error resuming bot: ${result.error}`);
+                    return;
+                }
+                
+                botStatus = 'running';
+                updateBotControlButtons();
+                updateStatus(`Bot resumed successfully! Status: ${result.status || 'running'}`);
+            } catch (error) {
+                console.error('Error resuming bot:', error);
+                alert('Failed to resume bot. Please check the console for details.');
+            }
+        }
+
+        function updateBotControlButtons() {
+            const runBtn = document.getElementById('runBotBtn');
+            const stopBtn = document.getElementById('stopBotBtn');
+            const pauseBtn = document.getElementById('pauseBotBtn');
+            const resumeBtn = document.getElementById('resumeBotBtn');
+            const deleteBtn = document.getElementById('deleteBotBtn');
+            
+            // Hide all buttons first
+            runBtn.style.display = 'none';
+            stopBtn.style.display = 'none';
+            pauseBtn.style.display = 'none';
+            resumeBtn.style.display = 'none';
+            deleteBtn.style.display = 'none';
+            
+            // Show appropriate buttons based on status
+            switch (botStatus) {
+                case 'stopped':
+                    runBtn.style.display = 'inline-block';
+                    deleteBtn.style.display = 'inline-block';
+                    break;
+                case 'running':
+                    stopBtn.style.display = 'inline-block';
+                    pauseBtn.style.display = 'inline-block';
+                    deleteBtn.style.display = 'inline-block';
+                    break;
+                case 'paused':
+                    stopBtn.style.display = 'inline-block';
+                    resumeBtn.style.display = 'inline-block';
+                    deleteBtn.style.display = 'inline-block';
+                    break;
+            }
+        }
+
+        async function deleteCurrentBot() {
+            if (!stateData.file_name) {
+                alert('No bot loaded to delete.');
+                return;
+            }
+            
+            if (botStatus !== 'stopped') {
+                alert('Please stop the bot before deleting it.');
+                return;
+            }
+            
+            if (!confirm(`Are you sure you want to delete the bot "${stateData.bot_name}"? This action cannot be undone.`)) {
+                return;
+            }
+            
+            try {
+                const result = await window.apiModule.deleteBot(stateData.file_name);
+                
+                if (result.error) {
+                    alert(`Error deleting bot: ${result.error}`);
+                    return;
+                }
+                
+                alert(`Bot "${stateData.bot_name}" deleted successfully!`);
+                
+                // Return to bot selection screen
+                document.getElementById('bot-selection-container').style.display = 'flex';
+                document.querySelector('.header').style.display = 'none';
+                document.querySelector('.view-tabs').style.display = 'none';
+                document.getElementById('tableView').style.display = 'none';
+                document.getElementById('status').style.display = 'none';
+                
+                // Refresh bot list
+                loadBots();
+                
+            } catch (error) {
+                console.error('Error deleting bot:', error);
+                alert('Failed to delete bot. Please check the console for details.');
+            }
         }
 
         // Clear click counts when clicking outside
