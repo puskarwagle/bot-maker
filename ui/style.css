@@ -1,0 +1,330 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Courier New', monospace;
+    background: #0a0a0a;
+    color: #00ff00;
+    margin: 0;
+    padding: 20px;
+    line-height: 1.4;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #333;
+    padding-bottom: 10px;
+}
+
+.controls {
+    display: flex;
+    gap: 10px;
+}
+
+.btn {
+    background: #1a1a1a;
+    color: #00ff00;
+    border: 1px solid #333;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 12px;
+}
+
+.btn:hover {
+    background: #2a2a2a;
+}
+
+.btn.danger {
+    color: #ff6b6b;
+}
+
+.btn.primary {
+    color: #00ffff;
+}
+
+.view-tabs {
+    display: flex;
+    gap: 5px;
+    margin-bottom: 20px;
+}
+
+.tab {
+    background: #1a1a1a;
+    color: #666;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    border-radius: 4px 4px 0 0;
+    font-family: inherit;
+}
+
+.tab.active {
+    background: #2a2a2a;
+    color: #00ff00;
+}
+
+.editing {
+    border: 2px solid #00ff00 !important;
+    box-shadow: 0 0 10px rgba(0, 255, 0, 0.3);
+}
+
+/* Table Grid Style */
+.table-view table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #0f0f0f;
+}
+
+.table-view th {
+    background: #333;
+    color: #fff;
+    padding: 10px;
+    border: 1px solid #555;
+    text-align: left;
+}
+
+.table-view td {
+    padding: 8px;
+    border: 1px solid #333;
+    vertical-align: top;
+}
+
+.editable {
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid #333;
+    color: inherit;
+    font-family: inherit;
+    font-size: inherit;
+    padding: 2px 4px;
+    border-radius: 0;
+    width: 100%;
+}
+
+.editable:focus {
+    background: #222;
+    border-bottom-color: #00ff00;
+    outline: none;
+}
+
+.state-id {
+    color: #00ffff;
+    font-weight: bold;
+}
+
+.action-select {
+    background: #1a1a1a;
+    color: #90ee90;
+    border: none;
+    border-bottom: 1px solid #333;
+    padding: 2px;
+    font-family: inherit;
+}
+
+.action-select:focus {
+    border-bottom-color: #00ff00;
+    outline: none;
+}
+
+.condition-item {
+    margin-bottom: 5px;
+    padding: 3px 6px;
+    background: #222;
+    border-radius: 3px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.condition-select {
+    background: #1a1a1a;
+    color: #ffff00;
+    border: none;
+    border-bottom: 1px solid #333;
+    padding: 2px;
+    font-family: inherit;
+    font-size: 11px;
+}
+
+.condition-select:focus {
+    border-bottom-color: #00ff00;
+    outline: none;
+}
+
+.next-state-select {
+    background: #1a1a1a;
+    color: #ff69b4;
+    border: none;
+    border-bottom: 1px solid #333;
+    padding: 2px;
+    font-family: inherit;
+    font-size: 11px;
+}
+
+.next-state-select:focus {
+    border-bottom-color: #00ff00;
+    outline: none;
+}
+
+.add-transition {
+    background: #1a3a1a;
+    color: #00ff00;
+    border: 1px solid #333;
+    padding: 2px 8px;
+    cursor: pointer;
+    font-size: 10px;
+    border-radius: 2px;
+}
+
+.remove-transition {
+    background: #3a1a1a;
+    color: #ff6b6b;
+    border: 1px solid #333;
+    padding: 1px 4px;
+    cursor: pointer;
+    font-size: 10px;
+    border-radius: 2px;
+}
+
+/* Flow Chart Style */
+.flow-view {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.flow-node {
+    background: #2a2a3a;
+    border: 2px solid #4a4a5a;
+    border-radius: 10px;
+    padding: 15px;
+    min-width: 250px;
+    position: relative;
+}
+
+.flow-node .state-header {
+    color: #00ffff;
+    font-weight: bold;
+    border-bottom: 1px solid #666;
+    padding-bottom: 5px;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.flow-node .transitions {
+    font-size: 0.9em;
+}
+
+.flow-node .transition {
+    margin: 5px 0;
+    padding: 3px;
+    background: #1a1a2a;
+    border-radius: 3px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+/* JSON Style */
+.json-view {
+    background: #001100;
+    white-space: pre;
+    font-family: 'Fira Code', monospace;
+    padding: 20px;
+    border-radius: 8px;
+    overflow-x: auto;
+    font-size: 13px;
+}
+
+.json-key {
+    color: #79b6f2;
+}
+
+.json-string {
+    color: #a3be8c;
+}
+
+.json-number {
+    color: #d08770;
+}
+
+.json-bracket {
+    color: #eceff4;
+}
+
+.alias-input {
+    background: #1a1a1a;
+    color: #666;
+    border: 1px solid #333;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-family: inherit;
+    font-size: 14px;
+}
+
+.status {
+    color: #666;
+    font-size: 12px;
+    margin-top: 10px;
+}
+
+.hidden {
+    display: none;
+}
+
+.selector-input {
+    background: #1a1a1a;
+    color: #ffa500;
+    border: none;
+    border-bottom: 1px solid #333;
+    padding: 2px;
+    font-family: inherit;
+    font-size: 11px;
+    width: 100%;
+    margin-top: 2px;
+}
+
+.selector-input:focus {
+    border-bottom-color: #00ff00;
+    outline: none;
+}
+
+.value-input {
+    background: #1a1a1a;
+    color: #ffa500;
+    border: none;
+    border-bottom: 1px solid #333;
+    padding: 2px;
+    font-family: inherit;
+    font-size: 11px;
+}
+
+.value-input:focus {
+    border-bottom-color: #00ff00;
+    outline: none;
+}
+
+.optional-input {
+    background: #1a1a1a;
+    color: #ff69b4;
+    border: none;
+    border-bottom: 1px solid #333;
+    padding: 2px;
+    font-family: inherit;
+    font-size: 10px;
+    margin-left: 5px;
+    width: 80px;
+}
+
+.optional-input:focus {
+    border-bottom-color: #00ff00;
+    outline: none;
+}

@@ -1,10 +1,14 @@
 {
+  "bot_description": "a seek bot for usage details contact admin",
+  "bot_image": "https://upload.wikimedia.org/wikipedia/en/thumb/9/9c/Seek_Limited_logo.svg/1200px-Seek_Limited_logo.svg.png",
   "bot_name": "seek",
+  "editingStateIndex": null,
+  "file_name": "seek.json",
   "start_url": "https://seek.com.au",
   "states": [
     {
-      "id": "state_1756542665851",
       "action": "fill",
+      "id": "state_1756542665851",
       "selectors": [
         "input#keywords-input",
         "input[name='keywords']",
@@ -13,12 +17,25 @@
       "transitions": [
         {
           "condition": "always",
-          "next": "pause"
+          "next": "state_1756603058811"
         }
       ],
-      "value": "Python"
+      "value": "Python",
+      "alias": "fill_5851"
+    },
+    {
+      "id": "state_1756603058811",
+      "alias": "fasf",
+      "action": "wait",
+      "selectors": [],
+      "transitions": [
+        {
+          "condition": "url_matches",
+          "next": "pause",
+          "conditional_parameter": "asdf"
+        }
+      ],
+      "value": "safas"
     }
-  ],
-  "file_name": "seek.json",
-  "editingStateIndex": null
+  ]
 }

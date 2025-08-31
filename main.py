@@ -25,7 +25,9 @@ browser_page = None
 # ----------------------------- UI Routes -----------------------------
 @app.route("/")
 def index():
-    return send_from_directory("ui", "index.html")
+    # return send_from_directory("ui", "index.html")
+    return send_from_directory("ui", "table.html")
+
 
 @app.route("/<path:filename>")
 def serve_ui_files(filename):

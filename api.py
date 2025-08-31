@@ -100,6 +100,8 @@ def register_api_routes(app, running_bots, bot_threads):
                     with open(bot_file, "r") as f:
                         bot_data = json.load(f)
                         bot_name = bot_data.get("bot_name", bot_file.stem)
+                        bot_description = bot_data.get("bot_description", "Description not available")
+                        bot_image = bot_data.get("bot_image", "bot image is not")
                         is_running = (
                             bot_name in running_bots and running_bots[bot_name].is_running
                         )
@@ -109,6 +111,8 @@ def register_api_routes(app, running_bots, bot_threads):
                                 "file": bot_file.name,
                                 "states_count": len(bot_data.get("states", [])),
                                 "start_url": bot_data.get("start_url", "https://example.com"),
+                                "bot_description": bot_description,
+                                "bot_image": bot_image,
                                 "is_running": is_running,
                             }
                         )
