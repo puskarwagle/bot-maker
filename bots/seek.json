@@ -1,7 +1,7 @@
 {
   "bot_description": "a seek bot for usage details contact admin",
   "bot_image": "https://upload.wikimedia.org/wikipedia/en/thumb/9/9c/Seek_Limited_logo.svg/1200px-Seek_Limited_logo.svg.png",
-  "bot_name": "denkil",
+  "bot_name": "seek",
   "editingStateIndex": null,
   "file_name": "seek.json",
   "start_url": "https://seek.com.au",
