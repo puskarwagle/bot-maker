@@ -826,14 +826,14 @@
             if (evt) evt.target.classList.add('active');
 
             // Hide all views
-            document.getElementById('tableView').classList.add('hidden');
-            document.getElementById('flowView').classList.add('hidden');
+            document.getElementById('tableView').style.display = 'none';
+            document.getElementById('flowView').style.display = 'none';
 
             // Show selected view
             if (view === 'table') {
-                document.getElementById('tableView').classList.remove('hidden');
+                document.getElementById('tableView').style.display = 'block';
             } else if (view === 'flow') {
-                document.getElementById('flowView').classList.remove('hidden');
+                document.getElementById('flowView').style.display = 'flex';
             }
             
             currentView = view;

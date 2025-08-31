@@ -23,6 +23,11 @@
           "condition": "url_matches",
           "next": "state_1756408322204",
           "pattern": "https://www.linkedin.com/feed"
+        },
+        {
+          "condition": "always",
+          "next": "pause",
+          "conditional_parameter": ""
         }
       ],
       "value": ""
@@ -253,6 +258,14 @@
       "action": "do_nothing",
       "alias": "do_nothing_9136",
       "id": "state_1756603999136",
+      "selectors": [],
+      "transitions": [],
+      "value": ""
+    },
+    {
+      "id": "state_1756610461762",
+      "alias": "",
+      "action": "do_nothing",
       "selectors": [],
       "transitions": [],
       "value": ""
