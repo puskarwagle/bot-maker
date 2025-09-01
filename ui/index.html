@@ -1,107 +1,72 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="night">
+<html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bot Builder</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.7.2/dist/full.css" rel="stylesheet" type="text/css" />
+    <title>State Machine Editor</title>
+    <link href="style.css" rel="stylesheet" type="text/css" />
 </head>
 
-<body class="min-h-screen bg-base-200 text-base-content">
-    <div class="container mx-auto p-6">
-        <h1 class="text-3xl font-bold mb-6 text-center text-primary">Bot Builder</h1>
-
-        <div role="tablist" class="tabs tabs-lift mb-6">
-            <input type="radio" name="my_tabs" role="tab" class="tab" aria-label="Bots" checked />
-            <div role="tabpanel" class="tab-content bg-base-100 border border-base-300 rounded-box p-6">
-                <div id="bots-tab" class="space-y-6">
-
-                    <!-- Available Bots List -->
-                    <div class="card bg-neutral shadow-lg p-4">
-                        <div class="flex justify-between items-center mb-4">
-                            <h2 class="text-lg font-semibold text-secondary">Available Bots</h2>
-                        </div>
-                        <div id="editor-bots-list" class="space-y-2 text-neutral-content">
-                            <p>Loading...</p>
-                        </div>
-                    </div>
-
-                    <!-- Validation Errors -->
-                    <div id="validation-errors" class="hidden text-error"></div>
-
-                    <!-- State Builder -->
-                    <div id="state-builder-card" class="card bg-neutral shadow-lg p-4 hidden">
-                        <h2 class="text-lg font-semibold mb-4 text-secondary">State Builder</h2>
-                        <div class="space-y-4">
-                            <div>
-                                <label class="label text-primary" for="action">Action</label>
-                                <select id="action" class="select select-bordered w-full action-select"></select>
-                            </div>
-
-                            <div>
-                                <label class="label text-primary" for="selectors-container">Selectors</label>
-                                <div id="selectors-container" class="space-y-2">
-                                    <input type="text" class="selector-input input input-bordered w-full"
-                                        placeholder="Enter CSS selector" />
-                                </div>
-                            </div>
-
-                            <div id="value-group">
-                                <label class="label text-primary" for="value">Value</label>
-                                <input type="text" id="value" placeholder="Enter value"
-                                    class="input input-bordered w-full" />
-                            </div>
-
-                            <div id="transitions-group">
-                                <h3 class="text-md font-semibold mb-2 text-secondary">Transitions</h3>
-                                <div id="transitions-container" class="space-y-2"></div>
-                                <button type="button" id="add-transition-btn"
-                                    class="btn btn-sm btn-outline btn-info mt-2">Add Transition</button>
-                            </div>
-
-                            <button id="add-state-btn" class="btn btn-primary w-full mt-2">Add State</button>
-                            <button id="cancel-state-btn" class="btn btn-outline w-full mt-2">Cancel</button>
-                        </div>
-                    </div>
-
-                    <!-- States List -->
-                    <div class="card bg-neutral shadow-lg p-4">
-                        <div class="flex justify-between items-center mb-4">
-                            <h2 class="text-lg font-semibold text-secondary">States</h2>
-                            <button id="new-state-btn" class="btn btn-sm hidden">New State</button>
-                        </div>
-                        <div id="states-container" class="space-y-3"></div>
-                    </div>
-
-                    <!-- JSON Preview -->
-                    <div class="card bg-neutral shadow-lg p-4">
-                        <h2 class="text-lg font-semibold mb-2 text-secondary">JSON Preview</h2>
-                        <pre id="json-preview" class="bg-base-300 p-3 rounded text-sm overflow-x-auto"></pre>
-                    </div>
-                </div>
-            </div>
-
-            <input type="radio" name="my_tabs" role="tab" class="tab" aria-label="Builder" />
-            <div role="tabpanel" class="tab-content bg-base-100 border border-base-300 rounded-box p-6">
-                <div id="builder-tab">
-                    <div class="card bg-neutral shadow-lg p-6 mb-6">
-                        <h2 class="text-xl font-semibold mb-4 text-secondary">Create a New Bot</h2>
-                        <div class="space-y-4">
-                            <input type="text" id="bot-name" placeholder="Bot Name"
-                                class="input input-bordered w-full" />
-                            <input type="text" id="start-url" placeholder="Start URL"
-                                class="input input-bordered w-full" value="https://example.com" />
-                            <button id="create-bot-btn" class="btn btn-primary w-full">Create Bot</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
+<body>
+    <!-- Modal overlay for creating new bot - moved outside the container -->
+    <div id="modal-overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:1000; justify-content:center; align-items:center;">
+        <div id="new-bot-form" style="display:flex; flex-direction:column; align-items:center; background:#111; padding:30px; border-radius:16px; color:#fff; width:400px; position:relative;">
+            <button id="close-modal" style="position:absolute; top:10px; right:15px; background:none; border:none; color:#fff; font-size:20px; cursor:pointer;">×</button>
+            <h2>Create New Bot</h2>
+            <input id="bot-name" placeholder="Bot Name" style="margin:8px 0; width:100%; padding:12px; border-radius:8px; border:none;"/>
+            <input id="start-url" placeholder="Start URL" style="margin:8px 0; width:100%; padding:12px; border-radius:8px; border:none;"/>
+            <button id="create-bot-btn" style="margin-top:16px; padding:12px 24px; border:none; border-radius:8px; cursor:pointer; background:#0f0; color:#000; font-weight:bold;">Create Bot</button>
         </div>
     </div>
 
+    <div id="bot-selection-container" style="display:flex; flex-wrap:wrap; gap:20px; justify-content:center; padding:40px; background-color:#000; min-height:100vh;">
+    </div>
+
+    <div class="header">
+        <div>
+            <h1>🤖 STATE MACHINE EDITOR</h1>
+            <!-- <input type="text" class="alias-input" id="botAlias" placeholder="Bot Name"> -->
+            <h2 id="botName"></h2>
+        </div>
+        <div class="controls">
+            <button class="btn" onclick="addState()">➕ Add State</button>
+        </div>
+    </div>
+
+    <select id="botSelect" style="display: none;">
+        <!-- Bot options will be populated dynamically -->
+    </select>
+
+    <div class="view-tabs">
+        <button class="tab active" onclick="switchView('table', event)">TABLE GRID</button>
+        <button class="tab" onclick="switchView('flow', event)">FLOW NODES</button>
+    </div>
+
+    <div id="tableView" class="table-view">
+        <table>
+            <thead>
+                <tr>
+                    <th>INDEX</th>
+                    <th>ACTION</th>
+                    <th>VALUE</th>
+                    <th>SELECTORS</th>
+                    <th>CONDITIONS → TRANSITIONS</th>
+                    <th>ACTIONS</th>
+                </tr>
+            </thead>
+            <tbody id="statesTable">
+                <!-- Dynamic content -->
+            </tbody>
+        </table>
+    </div>
+
+    <div id="flowView" class="flow-view" style="display: none;">
+        <!-- Dynamic flow nodes -->
+    </div>
+
+    <div class="status" id="status">Ready • Select a bot to start editing</div>
+
     <script type="module" src="js/app.js"></script>
 </body>
-
 </html>
