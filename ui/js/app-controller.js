@@ -1,12 +1,14 @@
 // js/app-controller.js
 import { StateManager } from './state-manager.js';
 import { UIComponents } from './ui-components.js';
+import { BotController } from './run.js';
 
 export class AppController {
     constructor(apiModule) {
         this.api = apiModule;
         this.stateManager = new StateManager();
         this.uiComponents = new UIComponents(this.stateManager);
+        this.botController = new BotController(apiModule); // Add this line
         this.currentView = 'table';
         this.autoSaveTimeout = null;
         this.stateIndex = 0; // Global state index from original
@@ -152,7 +154,9 @@ export class AppController {
         try {
             const bot = await this.api.loadBotFile(fileName);
             this.stateManager.setStateData(bot);
-    
+            
+            // Bot start Stop
+            this.botController.setCurrentBot(fileName);
             // Set bot name as read-only display in uppercase
             const botNameElem = document.getElementById('botName');
             if (botNameElem) {

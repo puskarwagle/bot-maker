@@ -54,7 +54,7 @@ def main():
     flask_thread.start()
     
     # Give Flask a moment to start, then open browser
-    time.sleep(2)
+    time.sleep(3)
     open_dashboard()
     
     # Keep server alive
