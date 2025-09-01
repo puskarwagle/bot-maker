@@ -12,15 +12,9 @@ export class AppController {
         this.stateIndex = 0; // Global state index from original
 
         // Configuration
-        this.actionTypes = [
-            'do_nothing', 'fill', 'click', 'navigate_to', 'press_enter',
-            'wait', 'scroll', 'hover', 'select', 'clear', 'type'
-        ];
-        
-        this.conditionTypes = [
-            'element_exists', 'url_matches', 'always', 'wait_for_element',
-            'text_contains', 'element_visible', 'element_clickable', 'timeout'
-        ];
+        this.actionTypes = [];
+        this.conditionTypes = [];
+
 
         this.init();
     }
@@ -158,25 +152,22 @@ export class AppController {
         try {
             const bot = await this.api.loadBotFile(fileName);
             this.stateManager.setStateData(bot);
-            
-            // Set bot name as read-only display, not editable
-            const botAliasElement = document.getElementById('botAlias');
-            if (botAliasElement) {
-                botAliasElement.value = bot.bot_name || '';
-                botAliasElement.readOnly = true;
-                botAliasElement.style.backgroundColor = '#333';
-                botAliasElement.style.cursor = 'not-allowed';
+    
+            // Set bot name as read-only display in uppercase
+            const botNameElem = document.getElementById('botName');
+            if (botNameElem) {
+                botNameElem.textContent = (bot.bot_name || 'Unnamed Bot').toUpperCase();
             }
-            
+    
             this.stateManager.setEditingStateId(null);
-            
+    
             // Show editor and hide bot selection
             document.getElementById('bot-selection-container').style.display = 'none';
             document.querySelector('.header').style.display = 'flex';
             document.querySelector('.view-tabs').style.display = 'flex';
             document.getElementById('tableView').style.display = 'block';
             document.getElementById('status').style.display = 'block';
-            
+    
             this.renderCurrentView();
             this.updateStatus(`Loaded ${bot.states.length} states from ${fileName}`);
         } catch (error) {
@@ -184,6 +175,7 @@ export class AppController {
             this.updateStatus(`Error loading bot: ${error.message}`);
         }
     }
+    
 
     async createNewBot() {
         console.log("create new button");
@@ -343,11 +335,11 @@ export class AppController {
     async autoSave() {
         const stateData = this.stateManager.getStateData();
         if (!stateData.file_name) return; // Don't auto-save if no file loaded
-        
+    
         clearTimeout(this.autoSaveTimeout);
         this.autoSaveTimeout = setTimeout(async () => {
             try {
-                stateData.bot_name = document.getElementById('botAlias').value || 'bot';
+                // Bot name is no longer modified here
                 const result = await this.api.saveBot(stateData);
                 if (!result.error) {
                     this.updateStatus('Auto-saved ✓');
@@ -356,7 +348,7 @@ export class AppController {
                 console.error('Auto-save failed:', error);
             }
         }, 100);
-    }
+    }    
 
     // Utility methods
     updateStatus(msg) {

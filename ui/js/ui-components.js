@@ -532,18 +532,16 @@ export class UIComponents {
 
         const img = document.createElement('img');
         img.src = bot.bot_image || 'https://via.placeholder.com/150';
-        img.style.cssText = 'width:100%; height:120px; object-fit:cover; border-radius:8px;';
+        img.style.cssText = 'width:100%; height:150px; object-fit:cover; border-radius:8px;';
         card.appendChild(img);
 
+        console.log("Creating card for bot:", bot);
+        console.log("bot_name:", bot.name);
+        
         const title = document.createElement('h2');
-        title.textContent = bot.bot_name;
-        title.style.cssText = 'margin:12px 0 4px 0; font-size:20px; text-align:center;';
+        title.textContent = bot.name;
+        title.style.cssText = 'margin:12px 0 4px 0; font-size:20px; text-align:center; color:red;';
         card.appendChild(title);
-
-        const file = document.createElement('div');
-        file.textContent = bot.file_name;
-        file.style.cssText = 'font-size:14px; color:#aaa; text-align:center;';
-        card.appendChild(file);
 
         const desc = document.createElement('p');
         desc.textContent = bot.bot_description || 'No description';
