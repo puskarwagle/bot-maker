@@ -22,10 +22,11 @@ async def wait_for_element(
     context: dict,
     conditional_parameter: Union[List[str], str] = None,
     timeout: int = 10000,
+    state: str = "visible",  # 'attached' | 'detached' | 'visible' | 'hidden'
     **kwargs
 ):
     """
-    Wait until one of the selectors exists (blocking condition).
+    Wait until one of the selectors matches a locator.
     Returns True if found within timeout, False otherwise.
     """
     if not conditional_parameter:
@@ -35,8 +36,9 @@ async def wait_for_element(
         conditional_parameter = [conditional_parameter]
 
     for selector in conditional_parameter:
+        locator = page.locator(selector)
         try:
-            await page.wait_for_selector(selector, timeout=timeout)
+            await locator.wait_for(state=state, timeout=timeout)
             return True
         except Exception:
             continue
@@ -51,7 +53,7 @@ async def wait_for_element_not_exists(
     **kwargs
 ):
     """
-    Wait until all selectors disappear from the DOM.
+    Wait until all selectors are detached/hidden.
     Returns True if gone within timeout, False otherwise.
     """
     if not conditional_parameter:
@@ -61,8 +63,9 @@ async def wait_for_element_not_exists(
         conditional_parameter = [conditional_parameter]
 
     for selector in conditional_parameter:
+        locator = page.locator(selector)
         try:
-            await page.wait_for_selector(selector, state="detached", timeout=timeout)
+            await locator.wait_for(state="detached", timeout=timeout)
         except Exception:
             return False
     return True

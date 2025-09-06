@@ -94,3 +94,53 @@ async def hover(page: Page, state: dict, context: dict):
             print(f"Hovered over {s}")
             return
     raise Exception(f"No working selector for hover in state {state['id']}")
+
+@register_action("scroll_into_view")
+async def scroll_into_view(page: Page, state: dict, context: dict):
+    """
+    Scroll the first matching selector into view if needed.
+    Accepts multiple selectors (tries in order).
+    """
+    selectors = state.get("selectors") or [state.get("selector")]
+    for s in selectors:
+        el = await page.query_selector(s)
+        if el:
+            await el.scroll_into_view_if_needed()
+            print(f"Scrolled {s} into view")
+            return
+    raise Exception(f"No working selector for scroll_into_view in state {state['id']}")
+
+@register_action("wait_for_selector")
+async def wait_for_selector(page: Page, state: dict, context: dict):
+    """
+    Wait for a selector to appear using Locator API.
+    Optional keys:
+      - 'timeout': milliseconds (default: 30s)
+      - 'state': 'attached' | 'detached' | 'visible' | 'hidden'
+    """
+    selectors = state.get("selectors") or [state.get("selector")]
+    timeout = state.get("timeout", 30000)
+    wait_state = state.get("state", "visible")
+
+    for s in selectors:
+        locator = page.locator(s)
+        try:
+            await locator.wait_for(state=wait_state, timeout=timeout)
+            print(f"✅ Locator {s} became {wait_state}")
+            return
+        except Exception as e:
+            print(f"⚠️ Failed waiting for {s}: {e}")
+
+    raise Exception(f"No locator became ready in state {state['id']}")
+
+@register_action("click_scroll_into_view")
+async def click_scroll_into_view(page: Page, state: dict, context: dict):
+    selectors = state.get("selectors") or [state.get("selector")]
+    for s in selectors:
+        el = await page.query_selector(s)
+        if el:
+            await el.scroll_into_view_if_needed()
+            await el.click()
+            print(f"Clicked {s} after scrolling into view")
+            return
+    raise Exception(f"No working selector for click_scroll_into_view in state {state['id']}")

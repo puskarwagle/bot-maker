@@ -8,34 +8,81 @@
   "states": [
     {
       "action": "fill",
-      "id": "state_1756542665851",
+      "alias": "fill keyword",
+      "id": "state_1756811208842",
       "selectors": [
-        "input#keywords-input",
-        "input[name='keywords']",
-        "input[placeholder='Enter keywords']"
+        "input[id=\"keywords-input\"]"
       ],
       "transitions": [
         {
           "condition": "always",
-          "next": "state_1756603058811"
+          "conditional_parameter": "",
+          "next": "state_1756811353559"
         }
       ],
-      "value": "Python",
-      "alias": "fill_5851"
+      "value": "python"
     },
     {
-      "id": "state_1756603058811",
-      "alias": "fasf",
-      "action": "wait",
+      "action": "fill",
+      "alias": "fill location",
+      "id": "state_1756811353559",
+      "selectors": [
+        "input[id=\"SearchBar__Where\"]"
+      ],
+      "transitions": [
+        {
+          "condition": "always",
+          "conditional_parameter": "",
+          "next": "state_1756811543494"
+        }
+      ],
+      "value": "sydney"
+    },
+    {
+      "action": "press_enter",
+      "alias": "press_enter_3494",
+      "id": "state_1756811543494",
       "selectors": [],
       "transitions": [
         {
-          "condition": "url_matches",
-          "next": "pause",
-          "conditional_parameter": "asdf"
+          "condition": "wait_for_element",
+          "conditional_parameter": "article[data-testid=\"job-card\"]",
+          "next": "state_1756811698613"
         }
       ],
-      "value": "safas"
+      "value": ""
+    },
+    {
+      "action": "scroll_into_view",
+      "alias": "click_8613",
+      "id": "state_1756811698613",
+      "selectors": [
+        "article[data-testid=\"job-card\"]"
+      ],
+      "transitions": [
+        {
+          "condition": "wait_for_element",
+          "conditional_parameter": "article[data-testid=\"job-card\"]",
+          "next": "state_1756812620764"
+        }
+      ],
+      "value": ""
+    },
+    {
+      "id": "state_1756812620764",
+      "alias": "",
+      "action": "click",
+      "selectors": [
+        "article[data-testid=\"job-card\"]"
+      ],
+      "transitions": [
+        {
+          "condition": "always",
+          "next": "pause",
+          "conditional_parameter": ""
+        }
+      ],
+      "value": ""
     }
   ]
 }

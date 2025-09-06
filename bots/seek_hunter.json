@@ -1,0 +1,242 @@
+{
+    "bot_description": "Automated job search on seek.com.au - searches Python jobs in Sydney",
+    "bot_image": "https://logos-world.net/wp-content/uploads/2021/02/Seek-Logo.png",
+    "bot_name": "seek_hunter",
+    "editingStateIndex": null,
+    "file_name": "seek_hunter.json",
+    "start_url": "https://www.seek.com.au",
+    "states": [
+      {
+        "action": "wait_for_selector",
+        "alias": "wait_homepage",
+        "id": "state_homepage",
+        "selectors": [
+          "input[data-automation='searchKeywordsField']",
+          "input[placeholder*='Job title']"
+        ],
+        "timeout": 10000,
+        "transitions": [
+          {
+            "condition": "always",
+            "next": "fill_keywords"
+          }
+        ]
+      },
+      {
+        "action": "fill",
+        "alias": "fill_keywords", 
+        "id": "fill_keywords",
+        "selectors": [
+          "input[data-automation='searchKeywordsField']",
+          "input[placeholder*='Job title']"
+        ],
+        "value": "Python Developer",
+        "transitions": [
+          {
+            "condition": "always",
+            "next": "fill_location"
+          }
+        ]
+      },
+      {
+        "action": "fill",
+        "alias": "fill_location",
+        "id": "fill_location", 
+        "selectors": [
+          "input[data-automation='searchLocationField']",
+          "input[placeholder*='Location']"
+        ],
+        "value": "Sydney NSW",
+        "transitions": [
+          {
+            "condition": "always",
+            "next": "search_submit"
+          }
+        ]
+      },
+      {
+        "action": "click",
+        "alias": "search_submit",
+        "id": "search_submit",
+        "selectors": [
+          "button[data-automation='searchSubmit']",
+          "button[type='submit']",
+          "button:has-text('Search')"
+        ],
+        "transitions": [
+          {
+            "condition": "wait_for_element",
+            "conditional_parameter": [
+              "[data-automation='jobListing']",
+              ".job-list li",
+              "[data-automation='normal-job']"
+            ],
+            "timeout": 15000,
+            "next": "wait_results"
+          }
+        ]
+      },
+      {
+        "action": "wait_for_selector",
+        "alias": "wait_results",
+        "id": "wait_results",
+        "selectors": [
+          "[data-automation='jobListing']",
+          ".job-list li"
+        ],
+        "timeout": 10000,
+        "transitions": [
+          {
+            "condition": "always",
+            "next": "apply_filters"
+          }
+        ]
+      },
+      {
+        "action": "click",
+        "alias": "apply_filters",
+        "id": "apply_filters",
+        "selectors": [
+          "button:has-text('Filters')",
+          "[data-automation='refineSearchButton']",
+          "button[aria-label*='filter']"
+        ],
+        "transitions": [
+          {
+            "condition": "wait_for_element",
+            "conditional_parameter": [
+              "input[value='7']",
+              "label:has-text('Last 7 days')"
+            ],
+            "timeout": 5000,
+            "next": "filter_date"
+          }
+        ]
+      },
+      {
+        "action": "click",
+        "alias": "filter_date",
+        "id": "filter_date",
+        "selectors": [
+          "input[value='7']",
+          "label:has-text('Last 7 days') input",
+          "input[type='radio'][value='7']"
+        ],
+        "transitions": [
+          {
+            "condition": "always", 
+            "next": "filter_salary"
+          }
+        ]
+      },
+      {
+        "action": "click",
+        "alias": "filter_salary",
+        "id": "filter_salary",
+        "selectors": [
+          "input[value='80000-999999']",
+          "label:has-text('$80,000+') input",
+          "input[data-automation='salary-80000']"
+        ],
+        "transitions": [
+          {
+            "condition": "always",
+            "next": "filter_worktype"
+          }
+        ]
+      },
+      {
+        "action": "click", 
+        "alias": "filter_worktype",
+        "id": "filter_worktype",
+        "selectors": [
+          "input[value='242']",
+          "label:has-text('Full time') input",
+          "input[data-automation='workType-full-time']"
+        ],
+        "transitions": [
+          {
+            "condition": "always",
+            "next": "apply_filters_submit"
+          }
+        ]
+      },
+      {
+        "action": "click",
+        "alias": "apply_filters_submit", 
+        "id": "apply_filters_submit",
+        "selectors": [
+          "button:has-text('Update results')",
+          "button[data-automation='updateResultsButton']",
+          "button[type='submit']:has-text('Apply')"
+        ],
+        "transitions": [
+          {
+            "condition": "wait_for_element",
+            "conditional_parameter": [
+              "[data-automation='jobListing']"
+            ],
+            "timeout": 10000,
+            "next": "sort_results"
+          }
+        ]
+      },
+      {
+        "action": "click",
+        "alias": "sort_results",
+        "id": "sort_results", 
+        "selectors": [
+          "select[data-automation='sortModeSelect']",
+          "button[data-automation='sortMode']"
+        ],
+        "transitions": [
+          {
+            "condition": "wait_for_element",
+            "conditional_parameter": [
+              "option[value='ListedDate']",
+              "li:has-text('Date')"
+            ],
+            "timeout": 3000,
+            "next": "select_date_sort"
+          }
+        ]
+      },
+      {
+        "action": "click",
+        "alias": "select_date_sort",
+        "id": "select_date_sort",
+        "selectors": [
+          "option[value='ListedDate']",
+          "li:has-text('Date')",
+          "button[data-automation='sortMode-ListedDate']"
+        ],
+        "transitions": [
+          {
+            "condition": "wait_for_element",
+            "conditional_parameter": [
+              "[data-automation='jobListing']"
+            ],
+            "timeout": 8000,
+            "next": "extract_first_job"
+          }
+        ]
+      },
+      {
+        "action": "extract",
+        "alias": "extract_first_job",
+        "id": "extract_first_job",
+        "selectors": [
+          "[data-automation='jobListing']:first-child h3",
+          ".job-list li:first-child h3 a",
+          "[data-automation='jobTitle']:first"
+        ],
+        "store_as": "first_job_title",
+        "transitions": [
+          {
+            "condition": "always",
+            "next": "pause"
+          }
+        ]
+      }
+    ]
+  }
